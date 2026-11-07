@@ -11,6 +11,8 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+import geckoImg from "@/assets/gecko.png";
+import { Toaster } from "@/components/ui/sonner";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -81,16 +83,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Gimmick Gecko" },
+      { name: "description", content: "Practice math contest problems with a pixel gecko coach." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500;700&family=VT323&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,
@@ -124,7 +128,33 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      <header className="border-b-4 border-border bg-panel">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4">
+          <Link to="/" className="flex items-center gap-3">
+            <img src={geckoImg} alt="" width={40} height={40} className="pixelated h-10 w-10" />
+            <span className="font-pixel text-xs text-primary sm:text-sm">Gimmick Gecko</span>
+          </Link>
+          <nav className="flex gap-1 font-pixel text-[10px] uppercase">
+            <Link
+              to="/"
+              activeOptions={{ exact: true }}
+              className="px-3 py-2 hover:bg-secondary"
+              activeProps={{ className: "bg-primary text-primary-foreground" }}
+            >
+              Hints
+            </Link>
+            <Link
+              to="/problems"
+              className="px-3 py-2 hover:bg-secondary"
+              activeProps={{ className: "bg-primary text-primary-foreground" }}
+            >
+              Problems
+            </Link>
+          </nav>
+        </div>
+      </header>
       <Outlet />
+      <Toaster />
     </QueryClientProvider>
   );
 }

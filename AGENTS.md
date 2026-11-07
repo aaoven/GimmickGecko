@@ -28,3 +28,6 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+- AI hints run server-side in `src/lib/hints.server.ts` (structured output via Lovable AI Gateway), exposed through `hints.functions.ts`; keeps the AI key off the client.
+- Contest problems live in the `problems` table (public read-only); the problem bank reads them via a server function.
