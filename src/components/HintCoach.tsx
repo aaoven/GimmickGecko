@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { ImagePlus, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import geckoImg from "@/assets/gecko.png";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { getHints } from "@/lib/hints.functions";
 import type { HintResult } from "@/lib/hints.server";
 
@@ -89,12 +89,10 @@ export function HintCoach({ initialProblem = "" }: { initialProblem?: string }) 
             </div>
           )}
           <div className="mt-4 flex flex-wrap gap-3">
-            <Button variant="secondary" asChild>
-              <label className="cursor-pointer">
-                <ImagePlus /> Upload image
-                <input type="file" accept="image/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
-              </label>
-            </Button>
+            <label className={buttonVariants({ variant: "secondary", className: "cursor-pointer" })}>
+              <ImagePlus /> Upload image
+              <input type="file" accept="image/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
+            </label>
             <Button onClick={submit} disabled={loading}>
               {loading ? <Loader2 className="animate-spin" /> : null}
               {loading ? "Thinking" : "Ask the gecko"}
