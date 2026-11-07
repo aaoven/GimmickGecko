@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-// "Bill" — a deep, older, wise-sounding voice for the monk gecko.
-const VOICE_ID = "pqHfZKP75CvOlQylNhV4";
+// "George" — a warm, older British voice for the professor gecko.
+const VOICE_ID = "JBFqnCBsd6RMkjVDRZzb";
 
 export const Route = createFileRoute("/api/speak")({
   server: {
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/api/speak")({
               body: JSON.stringify({
                 text,
                 model_id: "eleven_multilingual_v2",
-                voice_settings: { stability: 0.65, similarity_boost: 0.75, style: 0.35, use_speaker_boost: true, speed: 0.85 },
+                voice_settings: { stability: 0.65, similarity_boost: 0.75, style: 0.35, use_speaker_boost: true, speed: 0.95 },
               }),
               signal: request.signal,
             },
