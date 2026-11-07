@@ -360,20 +360,5 @@ Use clearly labeled demo content, such as:
 
 ---
 
-## 14. Implementation guidance for FreeBuff
 
-1. Work on **`branch-2`**, not `main`.
-2. Use the lo-fi sketch as the layout reference and this revised spec as the UX/style guide.
-3. Prioritize:
-   - accessible dark theme
-   - clear math branding
-   - responsive layout
-   - obvious navigation
-   - working prototype interactions
-4. Build the following first:
-   - homepage
-   - past problems page
-   - upload / solution page
-5. Keep all AI solving, authentication, and stored progress clearly marked as mocked unless the repo already has real integrations.
-6. Preserve the playful gecko personality while making the interface feel more polished and academic.
 
