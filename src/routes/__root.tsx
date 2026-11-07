@@ -14,6 +14,9 @@ import appCss from "../styles.css?url";
 import geckoImg from "@/assets/gecko.png";
 import { Toaster } from "@/components/ui/sonner";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { AccountSession, useAccount } from "@/components/AccountSession";
+import { Button } from "@/components/ui/button";
+import { UserRound } from "lucide-react";
 
 function NotFoundComponent() {
   return (
@@ -127,14 +130,15 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <AccountSession>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <header className="border-b-4 border-border bg-panel">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4">
           <Link to="/" className="flex items-center gap-3">
             <img src={geckoImg} alt="" width={40} height={40} className="pixelated h-10 w-10" />
             <span className="font-pixel text-xs text-primary sm:text-sm">Gimmick Gecko</span>
           </Link>
-          <nav className="flex gap-1 font-pixel text-[10px] uppercase">
+          <nav className="flex flex-wrap items-center gap-1 font-pixel text-[10px] uppercase">
             <Link
               to="/"
               activeOptions={{ exact: true }}
@@ -143,6 +147,7 @@ function RootComponent() {
             >
               Hints
             </Link>
+            <AccountLink />
             <Link
               to="/problems"
               className="px-3 py-2 hover:bg-secondary"
@@ -155,6 +160,14 @@ function RootComponent() {
       </header>
       <Outlet />
       <Toaster />
+      </AccountSession>
     </QueryClientProvider>
   );
+}
+
+function AccountLink() {
+  const { user, loading } = useAccount();
+  return <Button asChild variant="ghost" size="sm" disabled={loading} className="font-pixel text-[10px]">
+    <Link to={user ? "/account" : "/auth"}><UserRound />{user ? "Account" : "Log in"}</Link>
+  </Button>;
 }

@@ -13,6 +13,8 @@ export const Route = createFileRoute("/problems")({
       { name: "description", content: "Browse past AIME and contest problems filtered by the concepts needed to solve them." },
       { property: "og:title", content: "Problem Bank — Gimmick Gecko" },
       { property: "og:description", content: "Filter past contest problems by concept and practice with gecko hints." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(problemsQuery),

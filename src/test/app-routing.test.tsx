@@ -14,4 +14,16 @@ describe("App routing", () => {
 
     expect(matches.at(-1)?.routeId).not.toBe(rootRouteId);
   });
+  it("keeps the account page under the signed-in gate", () => {
+    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+    const matches = router.matchRoutes("/account");
+    expect(matches.map(match => match.routeId)).toContain("/_authenticated");
+    expect(matches.at(-1)?.routeId).toBe("/_authenticated/account");
+  });
+  it("keeps password recovery public", () => {
+    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+    const matches = router.matchRoutes("/reset-password");
+    expect(matches.map(match => match.routeId)).not.toContain("/_authenticated");
+    expect(matches.at(-1)?.routeId).toBe("/reset-password");
+  });
 });

@@ -10,6 +10,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Upload a math contest problem and get progressive hints, key concepts and the gimmick from a pixel gecko." },
       { property: "og:title", content: "Gimmick Gecko — Contest Math Hints" },
       { property: "og:description", content: "Progressive hints, key concepts and gimmicks for AMC and AIME problems." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Index,

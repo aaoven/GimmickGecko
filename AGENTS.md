@@ -31,3 +31,4 @@ use the editor.
 
 - AI hints run server-side in `src/lib/hints.server.ts` (structured output via Lovable AI Gateway), exposed through `hints.functions.ts`; keeps the AI key off the client.
 - Contest problems live in the `problems` table (public read-only); the problem bank reads them via a server function.
+- Accounts use Cloud Auth and one root AccountSession subscriber; private profiles are validated server-side and protected by owner-only RLS, with account pages under the authenticated layout.
