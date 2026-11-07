@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ImagePlus, Loader2, X } from "lucide-react";
+import { ImagePlus, Loader2, Square, Volume2, VolumeX, X } from "lucide-react";
+import { streamSpeech } from "@/lib/stream-speech";
 import { toast } from "sonner";
 import geckoImg from "@/assets/gecko.png";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -15,6 +16,44 @@ export function HintCoach({ initialProblem = "" }: { initialProblem?: string }) 
   const [result, setResult] = useState<HintResult | null>(null);
   const [revealed, setRevealed] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [voiceOn, setVoiceOn] = useState(true);
+  const [speaking, setSpeaking] = useState(false);
+  const speechCtrl = useRef<AbortController | null>(null);
+
+  useEffect(() => () => speechCtrl.current?.abort(), []);
+
+  function stopSpeaking() {
+    speechCtrl.current?.abort();
+    speechCtrl.current = null;
+    setSpeaking(false);
+  }
+
+  async function speak(text: string) {
+    stopSpeaking();
+    const ctrl = new AbortController();
+    speechCtrl.current = ctrl;
+    setSpeaking(true);
+    try {
+      await streamSpeech("/api/speak", text, ctrl.signal);
+    } catch (e) {
+      if (!ctrl.signal.aborted) {
+        console.error(e);
+        toast.error("The gecko lost its voice. Try again.");
+      }
+    } finally {
+      if (speechCtrl.current === ctrl) {
+        speechCtrl.current = null;
+        setSpeaking(false);
+      }
+    }
+  }
+
+  function nextHint() {
+    if (!result) return;
+    const i = revealed;
+    setRevealed(i + 1);
+    if (voiceOn) void speak(`Hint ${i + 1}. ${result.hints[i]}`);
+  }
 
   function onFile(file?: File) {
     if (!file) return;
@@ -123,7 +162,7 @@ export function HintCoach({ initialProblem = "" }: { initialProblem?: string }) 
             </ol>
             <div className="flex flex-wrap gap-3">
               {revealed < result.hints.length && (
-                <Button onClick={() => setRevealed((r) => r + 1)}>
+                <Button onClick={nextHint}>
                   Next hint ({revealed + 1}/{result.hints.length})
                 </Button>
               )}
@@ -147,6 +186,35 @@ export function HintCoach({ initialProblem = "" }: { initialProblem?: string }) 
               {speech}
               <span className="animate-caret">▌</span>
             </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button
+                size="sm"
+                variant={speaking ? "accent" : "secondary"}
+                onClick={() => {
+                  if (speaking) return stopSpeaking();
+                  const latest = result && revealed > 0 ? ` Hint ${revealed}. ${result.hints[revealed - 1]}` : "";
+                  const gimmick = result && revealed === 0 ? ` The gimmick: ${result.gimmick}` : "";
+                  void speak(speech + gimmick + latest);
+                }}
+                aria-label={speaking ? "Stop speaking" : "Read aloud"}
+              >
+                {speaking ? <Square /> : <Volume2 />}
+                {speaking ? "Stop" : "Read aloud"}
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  if (voiceOn) stopSpeaking();
+                  setVoiceOn((v) => !v);
+                }}
+                aria-pressed={voiceOn}
+                aria-label="Auto-read hints"
+              >
+                {voiceOn ? <Volume2 /> : <VolumeX />}
+                Auto {voiceOn ? "on" : "off"}
+              </Button>
+            </div>
             <div className="absolute -bottom-3 left-1/2 h-0 w-0 -translate-x-1/2 border-x-[12px] border-t-[12px] border-x-transparent border-t-border" />
           </div>
           <img

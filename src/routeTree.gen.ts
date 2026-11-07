@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProblemsRouteImport } from './routes/problems'
+import { Route as ApiSpeakRouteImport } from './routes/api/speak'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +23,40 @@ const ProblemsRoute = ProblemsRouteImport.update({
   path: '/problems',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiSpeakRoute = ApiSpeakRouteImport.update({
+  id: '/api/speak',
+  path: '/api/speak',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/problems': typeof ProblemsRoute
+  '/api/speak': typeof ApiSpeakRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/problems': typeof ProblemsRoute
+  '/api/speak': typeof ApiSpeakRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/problems': typeof ProblemsRoute
+  '/api/speak': typeof ApiSpeakRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/problems'
+  fullPaths: '/' | '/problems' | '/api/speak'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/problems'
-  id: '__root__' | '/' | '/problems'
+  to: '/' | '/problems' | '/api/speak'
+  id: '__root__' | '/' | '/problems' | '/api/speak'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProblemsRoute: typeof ProblemsRoute
+  ApiSpeakRoute: typeof ApiSpeakRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +75,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProblemsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/speak': {
+      id: '/api/speak'
+      path: '/api/speak'
+      fullPath: '/api/speak'
+      preLoaderRoute: typeof ApiSpeakRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProblemsRoute: ProblemsRoute,
+  ApiSpeakRoute: ApiSpeakRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
