@@ -1,6 +1,7 @@
-# GitHub Project Link
+# Presenting: Gimmick Gecko 🦎
+### We are the Chaffey-Burkers: Max Shen, Owen Yang, Alex Ma, Newky Li
 
-can i link a project here to a github repo
+We are the minds behind Gimmick-Gecko, a website dedicated to making math contest prep intuitive and fun!
 
 This project was built with [Lovable](https://lovable.dev).
 
