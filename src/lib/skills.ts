@@ -81,3 +81,8 @@ export function computeStarBreakdown(attempts: StarAttempt[]): ConceptStars[] {
 export function starsForAnswer(rating: number, hints: number, correct: boolean): number {
   return correct ? Math.max(0, rating - hints) : 0;
 }
+
+/** Solved and answer-revealed bank questions never offer additional stars. */
+export function availableProblemStars(rating: number, hints: number, solved: boolean, answerRevealed: boolean): number {
+  return starsForAnswer(rating, hints, !solved && !answerRevealed);
+}

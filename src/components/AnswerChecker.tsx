@@ -8,7 +8,7 @@ import { useAccount } from "@/components/AccountSession";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export function AnswerChecker({ answer, problemId, customId }: { answer: string | null; problemId?: string | undefined; customId?: string | null | undefined }) {
+export function AnswerChecker({ answer, problemId, customId, onChecked, disabled = false }: { answer: string | null; problemId?: string | undefined; customId?: string | null | undefined; onChecked?: (correct: boolean) => void; disabled?: boolean }) {
   const [value, setValue] = useState("");
   const [result, setResult] = useState<"correct" | "wrong" | null>(null);
   const [stars, setStars] = useState<{ earned: number; possible: number } | null>(null);
@@ -24,23 +24,25 @@ export function AnswerChecker({ answer, problemId, customId }: { answer: string 
       className="mt-4 flex flex-wrap items-center gap-3 border-t border-border pt-4"
       onSubmit={async (e) => {
         e.preventDefault();
-        if (busy || !value.trim()) return;
+        if (busy || disabled || !value.trim()) return;
         setError("");
         const correct = isCorrectAnswer(value, answer);
-        setResult(correct ? "correct" : "wrong");
         if ((problemId || customId) && user) {
           setBusy(true);
           try {
             const saved = problemId
               ? await record({ data: { problemId, answer: value } })
-              : await checkCustom({ data: { id: customId!, answer: value } });
+              : customId ? await checkCustom({ data: { id: customId, answer: value } }) : null;
+            if (!saved) return;
             setResult(saved.correct ? "correct" : "wrong");
             setStars({ earned: saved.earnedStars, possible: saved.possibleStars });
+            onChecked?.(saved.correct);
+            await queryClient.invalidateQueries({ queryKey: ["bank-progress"] });
             await queryClient.invalidateQueries({ queryKey: ["attempts"] });
             await queryClient.invalidateQueries({ queryKey: ["recommendations"] });
           } catch { setError("Your answer could not be saved. Please try again."); }
           finally { setBusy(false); }
-        }
+        } else { setResult(correct ? "correct" : "wrong"); onChecked?.(correct); }
       }}
     >
       <Input
@@ -54,7 +56,7 @@ export function AnswerChecker({ answer, problemId, customId }: { answer: string 
         aria-label="Your answer"
         className="h-9 w-40 bg-input"
       />
-      <Button type="submit" size="sm" variant="secondary" disabled={busy || !value.trim()}>
+      <Button type="submit" size="sm" variant="secondary" disabled={disabled || busy || !value.trim()}>
         {busy ? "Saving…" : "Check answer"}
       </Button>
       {result === "correct" && (

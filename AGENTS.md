@@ -36,3 +36,4 @@ use the editor.
 - Bank answers are checked server-side; a database trigger scores attempts using persisted, monotonic per-user problem help. Skill totals aggregate the best score per distinct attempted problem to avoid repeat-answer inflation.
 - Typed/uploaded gecko problems are saved per signed-in user in `custom_problems` (owner read-only RLS; writes only in server functions), with AI-assigned difficulty and concepts reused from the bank, and merge into the skillset breakdown; this keeps scoring server-side.
 - Shared button interaction feedback and control transitions live in the global stylesheet, with reduced-motion overrides, so effects remain consistent across pages.
+- Bank practice uses an inline per-question control and user-keyed server progress queries; saved help and successful attempts determine available stars, and previously solved answers return no additional award.

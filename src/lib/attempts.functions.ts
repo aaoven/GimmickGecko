@@ -9,9 +9,13 @@ export const recordAttempt = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ problemId: z.string().uuid(), answer: z.string().min(1).max(1000) }).parse(input))
   .handler(async ({ data, context }) => {
-    const { data: problem, error: problemError } = await context.supabase.from("problems").select("answer").eq("id", data.problemId).single();
+    const { data: problem, error: problemError } = await context.supabase.from("problems").select("answer, difficulty").eq("id", data.problemId).single();
     if (problemError || problem?.answer == null) throw new Error("This problem could not be checked.");
     const correct = isCorrectAnswer(data.answer, problem.answer);
+    const { data: solved, error: solvedError } = await context.supabase.from("attempts")
+      .select("problem_id").eq("user_id", context.userId).eq("problem_id", data.problemId).eq("correct", true).limit(1);
+    if (solvedError) throw new Error("Your previous attempts could not be loaded.");
+    if (solved?.length) return { correct, earnedStars: 0, possibleStars: problem.difficulty };
     const { data: attempt, error } = await context.supabase
       .from("attempts")
       .insert({ user_id: context.userId, problem_id: data.problemId, correct })
@@ -84,4 +88,15 @@ export const saveProblemHelp = createServerFn({ method: "POST" })
     const { error } = await context.supabase.rpc("save_problem_help", { _problem_id: data.problemId, _hints: data.hints, _answer_revealed: data.answerRevealed });
     if (error) throw new Error("Your hint usage could not be saved. Try again.");
     return { ok: true };
+  });
+
+export const getBankProgress = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const [help, attempts] = await Promise.all([
+      context.supabase.from("problem_help").select("problem_id, hints_revealed, answer_revealed").eq("user_id", context.userId),
+      context.supabase.from("attempts").select("problem_id").eq("user_id", context.userId).eq("correct", true),
+    ]);
+    if (help.error || attempts.error) throw new Error("Your problem progress could not be loaded.");
+    return { help: help.data ?? [], solved: [...new Set((attempts.data ?? []).map((row) => row.problem_id))] };
   });

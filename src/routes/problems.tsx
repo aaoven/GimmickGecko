@@ -1,15 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { listProblems } from "@/lib/problems.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { useAccount } from "@/components/AccountSession";
-import { saveProblemHelp } from "@/lib/attempts.functions";
-import { toast } from "sonner";
-import { AnswerChecker } from "@/components/AnswerChecker";
+import { getBankProgress } from "@/lib/attempts.functions";
+import { BankProblemPractice } from "@/components/BankProblemPractice";
 import { DifficultyStars } from "@/components/DifficultyStars";
 import { MathText } from "@/components/MathText";
-import { buttonVariants } from "@/components/ui/button";
 
 const problemsQuery = queryOptions({ queryKey: ["problems"], queryFn: () => listProblems() });
 
@@ -29,13 +27,13 @@ export const Route = createFileRoute("/problems")({
 });
 
 function ProblemsPage() {
-  const saveHelp = useServerFn(saveProblemHelp);
+  const loadProgress = useServerFn(getBankProgress);
   const { user } = useAccount();
+  const progress = useQuery({ queryKey: ["bank-progress", user?.id], queryFn: () => loadProgress(), enabled: !!user });
   const { data: problems } = useSuspenseQuery(problemsQuery);
   const [selected, setSelected] = useState<string[]>([]);
   const [contest, setContest] = useState("All");
   const [difficulty, setDifficulty] = useState(0);
-  const [openAnswer, setOpenAnswer] = useState<string | null>(null);
 
   const contests = useMemo(() => ["All", ...new Set(problems.map((p) => p.contest))], [problems]);
 
@@ -117,6 +115,7 @@ function ProblemsPage() {
         </aside>
 
         <section className="space-y-4">
+          {progress.isError && <p role="alert" className="text-destructive">Your saved progress could not be loaded. Reload before answering or revealing hints.</p>}
           <div className="font-pixel text-[10px] uppercase text-muted-foreground">
             {filtered.length} problem{filtered.length === 1 ? "" : "s"}
           </div>
@@ -143,24 +142,14 @@ function ProblemsPage() {
                   </span>
                 ))}
               </div>
-              <div className="flex flex-wrap items-center gap-3">
-                <Link to="/ask" search={{ problem: p.statement, problemId: p.id }} className={buttonVariants({ size: "sm" })}>
-                  Get gecko hints
-                </Link>
-                <button
-                  onClick={async () => {
-                    if (openAnswer === p.id) { setOpenAnswer(null); return; }
-                    try {
-                      if (user) await saveHelp({ data: { problemId: p.id, hints: 0, answerRevealed: true } });
-                      setOpenAnswer(p.id);
-                    } catch { toast.error("Could not save answer reveal. Try again."); }
-                  }}
-                  className={buttonVariants({ size: "sm", variant: "secondary" })}
-                >
-                  {openAnswer === p.id ? `Answer: ${p.answer}` : "Show answer"}
-                </button>
-              </div>
-              <AnswerChecker answer={p.answer} problemId={p.id} />
+              <BankProblemPractice
+                key={`${p.id}:${user?.id ?? "guest"}`}
+                problem={p}
+                hintsUsed={progress.data?.help.find((h) => h.problem_id === p.id)?.hints_revealed ?? 0}
+                answerRevealed={progress.data?.help.find((h) => h.problem_id === p.id)?.answer_revealed ?? false}
+                solved={progress.data?.solved.includes(p.id) ?? false}
+                ready={!user || progress.isSuccess}
+              />
             </article>
           ))}
         </section>

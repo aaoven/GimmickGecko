@@ -46,7 +46,20 @@ describe("accuracy", () => {
   });
 });
 
-import { computeStarBreakdown, starsForAnswer } from "@/lib/skills";
+import { availableProblemStars, computeStarBreakdown, starsForAnswer } from "@/lib/skills";
+
+describe("available bank stars", () => {
+  it("offers the rated stars minus one per hint", () => {
+    expect(availableProblemStars(5, 2, false, false)).toBe(3);
+    expect(availableProblemStars(1, 1, false, false)).toBe(0);
+  });
+  it("offers zero additional stars for a previously solved question", () => {
+    expect(availableProblemStars(5, 0, true, false)).toBe(0);
+  });
+  it("offers zero after an answer reveal, even without hints", () => {
+    expect(availableProblemStars(5, 0, false, true)).toBe(0);
+  });
+});
 
 describe("star scoring", () => {
   it("offers one star for a one-star question with zero hints", () => {
