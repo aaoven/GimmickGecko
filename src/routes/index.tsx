@@ -3,7 +3,6 @@ import { ArrowRight, BarChart3, BookOpen, Lightbulb, Volume2 } from "lucide-reac
 import geckoImg from "@/assets/gecko.png";
 
 export const Route = createFileRoute("/")({
-  validateSearch: z.object({ problem: z.string().optional(), problemId: z.string().uuid().optional() }),
   head: () => ({
     meta: [
       { title: "Gimmick Gecko — Contest Math Practice" },
@@ -17,15 +16,102 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-function Index() {
-  const { problem, problemId } = Route.useSearch();
+const features = [
+  {
+    icon: Lightbulb,
+    title: "Progressive hints",
+    body: (
+      <>
+        Paste a problem or snap a photo. The gecko names the <strong className="font-semibold text-foreground">key concepts</strong>, reveals the{" "}
+        <strong className="font-semibold text-highlight">hidden gimmick</strong>, then drops hints one step at a time — never the whole solution at once.
+      </>
+    ),
+  },
+  {
+    icon: Volume2,
+    title: "A voice that teaches",
+    body: (
+      <>
+        Every hint is <strong className="font-semibold text-foreground">read aloud</strong> in the gecko's warm old-professor voice. Auto-read is on by default; stop it any time.
+      </>
+    ),
+  },
+  {
+    icon: BookOpen,
+    title: "A real problem bank",
+    body: (
+      <>
+        Past <strong className="font-semibold text-foreground">AIME problems</strong> you can filter by the concepts they require, each rated{" "}
+        <strong className="font-semibold text-accent">one to five stars</strong>. Check your answer right on the card.
+      </>
+    ),
+  },
+  {
+    icon: BarChart3,
+    title: "A dashboard that knows you",
+    body: (
+      <>
+        A free account turns every checked answer into a <strong className="font-semibold text-foreground">per-concept skill graph</strong> and recommends bank problems that target your{" "}
+        <strong className="font-semibold text-accent">weakest concepts</strong>.
+      </>
+    ),
+  },
+];
+
+function HomePage() {
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10">
-      <h1 className="mb-2 font-pixel text-lg leading-relaxed text-primary sm:text-2xl">Stuck? Ask the gecko.</h1>
-      <p className="mb-8 max-w-2xl text-lg text-muted-foreground">
-        Paste or snap a contest problem. Get the key concepts, the hidden gimmick, and hints one step at a time.
-      </p>
-      <HintCoach key={problemId ?? problem ?? ""} initialProblem={problem ?? ""} problemId={problemId} />
+    <main className="mx-auto max-w-6xl px-4 py-12">
+      <section className="mb-16 grid items-center gap-10 lg:grid-cols-[1fr_280px]">
+        <div>
+          <p className="mb-4 font-pixel text-[10px] uppercase text-accent">Your contest math coach</p>
+          <h1 className="mb-5 font-pixel text-2xl leading-relaxed text-primary sm:text-4xl sm:leading-relaxed">
+            Stuck on a problem? <span className="text-foreground">Ask the gecko.</span>
+          </h1>
+          <p className="mb-8 max-w-xl text-lg leading-relaxed text-muted-foreground">
+            Gimmick Gecko trains you for math contests the way a coach would: hints before answers, gimmicks before grinding,
+            and a record of exactly which concepts need work.
+          </p>
+          <div className="flex flex-wrap items-center gap-4">
+            <Link
+              to="/ask"
+              className="inline-flex items-center gap-3 bg-primary px-8 py-5 font-pixel text-xs text-primary-foreground pixel-box-lg transition hover:brightness-110 sm:text-sm"
+            >
+              Ask the gecko <ArrowRight className="h-5 w-5" />
+            </Link>
+            <Link to="/problems" className="px-2 py-1 text-lg text-muted-foreground underline underline-offset-4 hover:text-foreground">
+              or browse the problem bank
+            </Link>
+          </div>
+        </div>
+        <img src={geckoImg} alt="Gimmick Gecko, a pixel-art professor gecko" width={1024} height={1024} className="pixelated mx-auto w-52 animate-gecko lg:w-64" />
+      </section>
+
+      <section className="mb-16">
+        <h2 className="mb-2 font-pixel text-sm text-primary sm:text-base">Everything you need to train</h2>
+        <p className="mb-8 text-muted-foreground">Four tools, one feedback loop: practice, check, review, repeat.</p>
+        <div className="grid gap-6 sm:grid-cols-2">
+          {features.map((f) => (
+            <article key={f.title} className="bg-card p-6 pixel-box">
+              <f.icon className="mb-4 h-8 w-8 text-accent" />
+              <h3 className="mb-3 font-pixel text-[11px] uppercase text-primary">{f.title}</h3>
+              <p className="leading-relaxed text-muted-foreground">{f.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="bg-panel p-8 text-center pixel-box-lg">
+        <h2 className="mb-3 font-pixel text-sm text-primary sm:text-base">Ready for your first gimmick?</h2>
+        <p className="mx-auto mb-6 max-w-md text-muted-foreground">
+          Bring a problem that's been beating you. The gecko will meet you where you are.
+        </p>
+        <Link
+          to="/ask"
+          className="inline-flex items-center gap-3 bg-primary px-8 py-5 font-pixel text-xs text-primary-foreground pixel-box transition hover:brightness-110 sm:text-sm"
+        >
+          Ask the gecko <ArrowRight className="h-5 w-5" />
+        </Link>
+      </section>
     </main>
   );
 }

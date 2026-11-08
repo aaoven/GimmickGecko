@@ -126,7 +126,7 @@ function AccountPage() {
                       <span key={c} className={`px-2 py-0.5 text-xs ${weak.has(c) ? "bg-accent text-accent-foreground" : "bg-secondary text-muted-foreground"}`}>{c}</span>
                     ))}
                   </div>
-                  <Link to="/" search={{ problem: p.statement, problemId: p.id }} className={buttonVariants({ size: "sm" })}>Get gecko hints</Link>
+                  <Link to="/ask" search={{ problem: p.statement, problemId: p.id }} className={buttonVariants({ size: "sm" })}>Get gecko hints</Link>
                   <AnswerChecker answer={p.answer} problemId={p.id} />
                 </article>
               );

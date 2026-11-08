@@ -141,7 +141,7 @@ function ProblemsPage() {
                 ))}
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <Link to="/" search={{ problem: p.statement, problemId: p.id }} className={buttonVariants({ size: "sm" })}>
+                <Link to="/ask" search={{ problem: p.statement, problemId: p.id }} className={buttonVariants({ size: "sm" })}>
                   Get gecko hints
                 </Link>
                 <button
