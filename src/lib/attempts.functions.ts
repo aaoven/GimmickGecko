@@ -4,6 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { recommendProblems, weakestConcepts } from "@/lib/recommendations";
 import { isCorrectAnswer } from "@/lib/answers";
 import type { Problem } from "@/lib/problems.functions";
+import { includeRevealedProblems } from "@/lib/skills";
 
 export const recordAttempt = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -37,13 +38,19 @@ export const getMyAttempts = createServerFn({ method: "GET" })
       .select("id, solved, earned_stars, difficulty, concepts")
       .eq("attempted", true);
     if (customError) throw new Error("Your attempts could not be loaded.");
+    const { data: revealed, error: revealError } = await context.supabase.from("problem_help")
+      .select("problem_id, problems(difficulty, concepts)").eq("user_id", context.userId).eq("answer_revealed", true);
+    if (revealError) throw new Error("Your revealed answers could not be loaded.");
     return [
-      ...(data ?? []).map((row) => ({
+      ...includeRevealedProblems((data ?? []).map((row) => ({
         problemId: row.problem_id,
         correct: row.correct,
         earnedStars: row.earned_stars,
         possibleStars: row.possible_stars,
         concepts: (row.problems as unknown as { concepts: string[] } | null)?.concepts ?? [],
+      })), (revealed ?? []).flatMap((row) => {
+        const problem = row.problems as unknown as { difficulty: number; concepts: string[] } | null;
+        return problem ? [{ problemId: row.problem_id, difficulty: problem.difficulty, concepts: problem.concepts }] : [];
       })),
       ...(custom ?? []).map((row) => ({
         problemId: `custom:${row.id}`,
@@ -68,12 +75,18 @@ export const getRecommendations = createServerFn({ method: "GET" })
       .order("year", { ascending: true })
       .order("problem_number", { ascending: true });
     if (problemsError) throw new Error("Problems could not be loaded.");
-    const records = (attempts ?? []).map((row) => ({
+    const { data: revealed, error: revealError } = await context.supabase.from("problem_help")
+      .select("problem_id, problems(difficulty, concepts)").eq("user_id", context.userId).eq("answer_revealed", true);
+    if (revealError) throw new Error("Your revealed answers could not be loaded.");
+    const records = includeRevealedProblems((attempts ?? []).map((row) => ({
       problemId: row.problem_id,
       correct: row.correct,
       earnedStars: row.earned_stars,
       possibleStars: row.possible_stars,
       concepts: (row.problems as unknown as { concepts: string[] } | null)?.concepts ?? [],
+    })), (revealed ?? []).flatMap((row) => {
+      const problem = row.problems as unknown as { difficulty: number; concepts: string[] } | null;
+      return problem ? [{ problemId: row.problem_id, difficulty: problem.difficulty, concepts: problem.concepts }] : [];
     }));
     return {
       weakest: weakestConcepts(records),

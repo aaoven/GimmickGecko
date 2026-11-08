@@ -52,7 +52,11 @@ export function BankProblemPractice({ problem, hintsUsed, answerRevealed, solved
       if (user) await saveHelp({ data: { problemId: problem.id, hints: next, answerRevealed: answer } });
       if (answer) { setRevealedAnswer(true); setShowAnswer(true); }
       else { setLocalHints(next); setVisibleHints(nextVisible); }
-      if (user) await queryClient.invalidateQueries({ queryKey: ["bank-progress"] });
+      if (user) await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["bank-progress"] }),
+        queryClient.invalidateQueries({ queryKey: ["attempts"] }),
+        queryClient.invalidateQueries({ queryKey: ["recommendations"] }),
+      ]);
     } catch { toast.error("Could not load or save your help. Please try again."); }
     finally { setBusy(false); }
   }

@@ -46,6 +46,18 @@ export interface StarAttempt {
   possibleStars: number;
 }
 
+/** Answer reveals count as zero-score practice without replacing earned scores. */
+export function includeRevealedProblems<T extends StarAttempt>(attempts: T[], revealed: { problemId: string; difficulty: number; concepts: string[] }[]): (T | SkillAttempt)[] {
+  const seen = new Set(attempts.map((attempt) => attempt.problemId));
+  const extra: SkillAttempt[] = [];
+  for (const problem of revealed) {
+    if (seen.has(problem.problemId)) continue;
+    seen.add(problem.problemId);
+    extra.push({ problemId: problem.problemId, concepts: problem.concepts, correct: false, earnedStars: 0, possibleStars: problem.difficulty });
+  }
+  return [...attempts, ...extra];
+}
+
 export interface ConceptStars {
   concept: string;
   earned: number;

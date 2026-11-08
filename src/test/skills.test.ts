@@ -46,7 +46,25 @@ describe("accuracy", () => {
   });
 });
 
-import { availableProblemStars, computeStarBreakdown, starsForAnswer } from "@/lib/skills";
+import { availableProblemStars, computeStarBreakdown, includeRevealedProblems, starsForAnswer } from "@/lib/skills";
+
+describe("revealed answers in skill totals", () => {
+  const attempt = { problemId: "answered", correct: true, concepts: ["Algebra"], earnedStars: 1, possibleStars: 2 };
+  const reveal = { problemId: "revealed", concepts: ["Algebra"], difficulty: 1 };
+  it("changes one out of two stars to one out of three after a new one-star reveal", () => {
+    expect(computeStarBreakdown(includeRevealedProblems([attempt], [reveal]))).toEqual([
+      { concept: "Algebra", earned: 1, possible: 3, problems: 2 },
+    ]);
+  });
+  it("counts repeated reveals only once", () => {
+    expect(computeStarBreakdown(includeRevealedProblems([attempt], [reveal, reveal]))[0]?.possible).toBe(3);
+  });
+  it("preserves earned stars and the denominator for previously answered questions", () => {
+    expect(computeStarBreakdown(includeRevealedProblems([attempt], [{ ...reveal, problemId: "answered", difficulty: 2 }]))).toEqual([
+      { concept: "Algebra", earned: 1, possible: 2, problems: 1 },
+    ]);
+  });
+});
 
 describe("available bank stars", () => {
   it("offers the rated stars minus one per hint", () => {
