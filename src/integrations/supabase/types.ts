@@ -18,21 +18,27 @@ export type Database = {
         Row: {
           correct: boolean
           created_at: string
+          earned_stars: number
           id: string
+          possible_stars: number
           problem_id: string
           user_id: string
         }
         Insert: {
           correct: boolean
           created_at?: string
+          earned_stars?: number
           id?: string
+          possible_stars?: number
           problem_id: string
           user_id: string
         }
         Update: {
           correct?: boolean
           created_at?: string
+          earned_stars?: number
           id?: string
+          possible_stars?: number
           problem_id?: string
           user_id?: string
         }
@@ -46,6 +52,42 @@ export type Database = {
           },
           {
             foreignKeyName: "attempts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      problem_help: {
+        Row: {
+          answer_revealed: boolean
+          hints_revealed: number
+          problem_id: string
+          user_id: string
+        }
+        Insert: {
+          answer_revealed?: boolean
+          hints_revealed?: number
+          problem_id: string
+          user_id: string
+        }
+        Update: {
+          answer_revealed?: boolean
+          hints_revealed?: number
+          problem_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "problem_help_problem_id_fkey"
+            columns: ["problem_id"]
+            isOneToOne: false
+            referencedRelation: "problems"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "problem_help_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -118,7 +160,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      save_problem_help: {
+        Args: {
+          _answer_revealed?: boolean
+          _hints: number
+          _problem_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
