@@ -33,8 +33,8 @@ function AccountPage() {
   const query = useQuery({ queryKey: ["profile", user?.id], queryFn: () => fetchProfile() });
   const attemptsQuery = useQuery({ queryKey: ["attempts", user?.id], queryFn: () => fetchAttempts() });
   const recsQuery = useQuery({ queryKey: ["recommendations", user?.id], queryFn: () => fetchRecommendations() });
-  const stats = useMemo(() => computeSkillBreakdown(attemptsQuery.data ?? []), [attemptsQuery.data]);
-  const maxTotal = Math.max(1, ...stats.map((s) => s.possible));
+  const stats = useMemo(() => computeStarBreakdown(attemptsQuery.data ?? []), [attemptsQuery.data]);
+  const maxTotal = Math.max(1, ...stats.map((s) => s.earned));
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
@@ -75,20 +75,15 @@ function AccountPage() {
             {stats.map((s) => (
               <li key={s.concept}>
                 <div className="mb-1 flex items-baseline justify-between gap-3">
-                  <span className="font-pixel text-[9px] uppercase">{s.concept}</span>
-                  <span className="text-sm text-muted-foreground">{s.earned}/{s.possible} stars · {accuracy(s)}%</span>
+                  <span className="min-w-0 break-words font-pixel text-[9px] uppercase leading-relaxed">{s.concept}</span>
+                  <span className="shrink-0 text-sm text-muted-foreground"><span className="text-accent">★</span> {s.earned} {s.earned === 1 ? "star" : "stars"}</span>
                 </div>
-                <div className="flex h-4 w-full bg-secondary" role="img" aria-label={`${s.concept}: ${s.earned} of ${s.possible} stars earned`}>
+                <div className="flex h-4 w-full bg-secondary" role="img" aria-label={`${s.concept}: ${s.earned} stars`}>
                   <div className="h-full bg-primary" style={{ width: `${(s.earned / maxTotal) * 100}%` }} />
-                  <div className="h-full bg-destructive" style={{ width: `${((s.possible - s.earned) / maxTotal) * 100}%` }} />
                 </div>
               </li>
             ))}
           </ul>
-          <div className="mt-3 flex gap-4 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 bg-primary" /> Earned</span>
-            <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 bg-destructive" /> Unearned</span>
-          </div>
         </>
       )}
     </section>
