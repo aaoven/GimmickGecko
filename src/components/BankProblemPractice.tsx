@@ -32,7 +32,8 @@ export function BankProblemPractice({ problem, hintsUsed, answerRevealed, solved
   const used = Math.max(hintsUsed, localHints);
   const shown = answerRevealed || revealedAnswer;
   const completed = solved || localSolved;
-  const stars = availableProblemStars(problem.difficulty, used, completed, shown, Math.max(incorrectAnswers, localIncorrect));
+  const missed = Math.max(incorrectAnswers, localIncorrect);
+  const stars = availableProblemStars(problem.difficulty, used, completed, shown, missed);
 
   async function reveal(answer = false) {
     if (busy || !ready) return;
@@ -73,7 +74,7 @@ export function BankProblemPractice({ problem, hintsUsed, answerRevealed, solved
       </Button>
       <div role="status" aria-live="polite" aria-atomic="true" className="flex min-h-9 items-center gap-2 text-sm text-muted-foreground">
         <Star aria-hidden="true" className="h-5 w-5 shrink-0 fill-accent text-accent" />
-        <span>{!ready ? "Loading stars…" : <><strong className="tabular-nums text-accent">{stars}</strong> {stars === 1 ? "star" : "stars"} available{completed ? " · Already solved" : shown ? " · Answer revealed" : ""}</>}</span>
+        <span>{!ready ? "Loading stars…" : <><strong className="tabular-nums text-accent">{stars}</strong> {stars === 1 ? "star" : "stars"} available{completed ? " · Already solved" : shown ? " · Answer revealed" : stars === 0 && missed > 0 ? " · Stars lost to wrong answers" : ""}</>}</span>
       </div>
     </div>
     {hints && <div id={`hints-${problem.id}`} className="mt-5 border-t border-border pt-4">

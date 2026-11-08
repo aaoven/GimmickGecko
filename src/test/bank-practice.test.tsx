@@ -32,6 +32,17 @@ describe("progressive bank hints", () => {
     await screen.findByText("Second nudge");
     expect(screen.queryByText("Third nudge")).not.toBeInTheDocument();
   });
+  it("explains when wrong answers used up every available star", () => {
+    render(<BankProblemPractice problem={problem} hintsUsed={0} answerRevealed={false} solved={false} incorrectAnswers={3} ready />);
+    expect(screen.getByText(/stars available · Stars lost to wrong answers/)).toBeInTheDocument();
+  });
+  it("keeps the solved and answer-revealed indicators ahead of the wrong-answer one", () => {
+    render(<BankProblemPractice problem={problem} hintsUsed={0} answerRevealed={false} solved incorrectAnswers={3} ready />);
+    expect(screen.getByText(/stars available · Already solved/)).toBeInTheDocument();
+    cleanup();
+    render(<BankProblemPractice problem={problem} hintsUsed={0} answerRevealed solved={false} incorrectAnswers={3} ready />);
+    expect(screen.getByText(/stars available · Answer revealed/)).toBeInTheDocument();
+  });
   it("does not automatically reveal previously counted hints or charge for them twice", async () => {
     render(<BankProblemPractice problem={problem} hintsUsed={3} answerRevealed={false} solved={false} ready />);
     fireEvent.click(screen.getByRole("button", { name: "Get gecko hints" }));
