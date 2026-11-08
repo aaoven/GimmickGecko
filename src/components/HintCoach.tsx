@@ -11,7 +11,13 @@ import { saveProblemHelp } from "@/lib/attempts.functions";
 import { getHints } from "@/lib/hints.functions";
 import type { HintResult } from "@/lib/hints.server";
 
-export function HintCoach({ initialProblem = "", problemId }: { initialProblem?: string; problemId?: string | undefined }) {
+export function HintCoach({
+  initialProblem = "",
+  problemId,
+}: {
+  initialProblem?: string;
+  problemId?: string | undefined;
+}) {
   const { user } = useAccount();
   const saveHelp = useServerFn(saveProblemHelp);
   const [savingHelp, setSavingHelp] = useState(false);
@@ -20,9 +26,11 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
   const [image, setImage] = useState<string | undefined>();
   const bankProblemId = problem === initialProblem && !image ? problemId : undefined;
   const [loading, setLoading] = useState(false);
+  const [readingImage, setReadingImage] = useState(false);
   const [result, setResult] = useState<HintResult | null>(null);
   const [revealed, setRevealed] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [showGimmick, setShowGimmick] = useState(false);
   const [voiceOn, setVoiceOn] = useState(true);
   const [speaking, setSpeaking] = useState(false);
   const speechCtrl = useRef<AbortController | null>(null);
@@ -56,25 +64,40 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
   }
 
   async function revealHelp(answer = false) {
-    if (!result || savingHelp) return;
-    if (answer && showAnswer) { setShowAnswer(false); return; }
+    if (!result || savingHelp || (!answer && revealed >= result.hints.length)) return;
+    if (answer && showAnswer) {
+      setShowAnswer(false);
+      return;
+    }
     const next = answer ? revealed : revealed + 1;
     setSavingHelp(true);
     try {
-      if (bankProblemId && user) await saveHelp({ data: { problemId: bankProblemId, hints: next, answerRevealed: answer } });
+      if (bankProblemId && user)
+        await saveHelp({ data: { problemId: bankProblemId, hints: next, answerRevealed: answer } });
       if (answer) setShowAnswer(true);
       else {
         setRevealed(next);
         if (voiceOn) void speak(`Hint ${next}. ${result.hints[revealed]}`);
       }
-    } catch { toast.error("Your hint usage could not be saved. Try again."); }
-    finally { setSavingHelp(false); }
+    } catch {
+      toast.error("Your hint usage could not be saved. Try again.");
+    } finally {
+      setSavingHelp(false);
+    }
+  }
+
+  function clearResult() {
+    stopSpeaking();
+    setResult(null);
+    setRevealed(0);
+    setShowAnswer(false);
+    setShowGimmick(false);
   }
 
   function onFile(file?: File) {
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please upload an image.");
+    if (!file || readingImage || loading) return;
+    if (!["image/png", "image/jpeg", "image/webp", "image/gif"].includes(file.type)) {
+      toast.error("Use a PNG, JPEG, WebP, or GIF image.");
       return;
     }
     if (file.size > 4 * 1024 * 1024) {
@@ -82,21 +105,35 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
       return;
     }
     const reader = new FileReader();
-    reader.onload = () => setImage(reader.result as string);
+    setReadingImage(true);
+    reader.onload = () => {
+      clearResult();
+      setImage(reader.result as string);
+      setReadingImage(false);
+    };
+    reader.onerror = () => {
+      setReadingImage(false);
+      toast.error("That image could not be read. Try a different file.");
+    };
     reader.readAsDataURL(file);
   }
 
   async function submit() {
-    if (!problem.trim() && !image) {
+    if (loading || readingImage) return;
+    if (!problem.trim() && !image && !bankProblemId) {
       toast.error("Paste a problem or upload a picture first.");
       return;
     }
     setLoading(true);
-    setResult(null);
-    setRevealed(0);
-    setShowAnswer(false);
+    clearResult();
     try {
-      const res = await fetchHints({ data: { problem, imageDataUrl: image } });
+      const res = await fetchHints({
+        data: {
+          problem: bankProblemId ? "" : problem,
+          problemId: bankProblemId,
+          imageDataUrl: image,
+        },
+      });
       if (!res.ok) toast.error(res.error);
       else setResult(res.result);
     } catch {
@@ -111,7 +148,7 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
     : !result
       ? "Feed me a contest problem! I'll drop hints one at a time."
       : revealed === 0
-        ? `A ${result.topic} problem! Here's the gimmick. Want a hint?`
+        ? `A ${result.topic} puzzle! Tap the gecko for the hidden trick, or try a hint.`
         : revealed < result.hints.length
           ? "Keep going — try it before the next hint!"
           : "That's all my hints. You've got this!";
@@ -120,13 +157,21 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
     <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
       <section className="space-y-6">
         <div className="bg-card p-5 pixel-box-lg">
-          <label htmlFor="problem" className="mb-3 block font-pixel text-[10px] uppercase text-muted-foreground">
+          <label
+            htmlFor="problem"
+            className="mb-3 block font-pixel text-[10px] uppercase text-muted-foreground"
+          >
             Your problem
           </label>
           <textarea
             id="problem"
             value={problem}
-            onChange={(e) => setProblem(e.target.value)}
+            onChange={(e) => {
+              clearResult();
+              setProblem(e.target.value);
+            }}
+            maxLength={5000}
+            disabled={loading}
             rows={6}
             placeholder="e.g. Find the largest positive integer n for which n³ + 100 is divisible by n + 10."
             className="w-full resize-y bg-input p-3 font-mono text-xl leading-snug text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
@@ -135,7 +180,11 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
             <div className="relative mt-3 inline-block">
               <img src={image} alt="Uploaded problem" className="max-h-48 border-3 border-border" />
               <button
-                onClick={() => setImage(undefined)}
+                onClick={() => {
+                  clearResult();
+                  setImage(undefined);
+                }}
+                disabled={loading || readingImage}
                 className="absolute -right-2 -top-2 bg-destructive p-1 text-destructive-foreground"
                 aria-label="Remove image"
               >
@@ -144,13 +193,24 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
             </div>
           )}
           <div className="mt-4 flex flex-wrap gap-3">
-            <label className={buttonVariants({ variant: "secondary", className: "cursor-pointer" })}>
+            <label
+              className={buttonVariants({ variant: "secondary", className: "cursor-pointer" })}
+            >
               <ImagePlus /> Upload image
-              <input type="file" accept="image/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                disabled={loading || readingImage}
+                className="hidden"
+                onChange={(e) => {
+                  onFile(e.target.files?.[0]);
+                  e.currentTarget.value = "";
+                }}
+              />
             </label>
-            <Button onClick={submit} disabled={loading}>
+            <Button onClick={submit} disabled={loading || readingImage}>
               {loading ? <Loader2 className="animate-spin" /> : null}
-              {loading ? "Thinking" : "Ask the gecko"}
+              {loading ? "Thinking" : readingImage ? "Reading image…" : "Ask the gecko"}
             </Button>
           </div>
         </div>
@@ -159,19 +219,34 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
           <div className="space-y-4">
             <div className="flex flex-wrap gap-2">
               {result.concepts.map((c) => (
-                <span key={c} className="bg-accent px-2 py-1 font-pixel text-[9px] uppercase text-accent-foreground">
+                <span
+                  key={c}
+                  className="bg-accent px-2 py-1 font-pixel text-[9px] uppercase text-accent-foreground"
+                >
                   {c}
                 </span>
               ))}
             </div>
             <div className="bg-highlight p-4 text-highlight-foreground pixel-box">
-              <div className="mb-1 font-pixel text-[10px] uppercase">★ The gimmick</div>
-              <p className="text-lg">{result.gimmick}</p>
+              <button
+                type="button"
+                className="font-pixel text-[10px] uppercase underline underline-offset-4"
+                aria-expanded={showGimmick}
+                onClick={() => setShowGimmick((v) => !v)}
+              >
+                {showGimmick ? "Hide the gimmick" : "★ Reveal the gimmick"}
+              </button>
+              {showGimmick && <p className="mt-2 text-lg">{result.gimmick}</p>}
             </div>
             <ol className="space-y-3">
               {result.hints.slice(0, revealed).map((h, i) => (
-                <li key={i} className="animate-in fade-in slide-in-from-left-2 bg-card p-4 pixel-box">
-                  <div className="mb-1 font-pixel text-[10px] uppercase text-primary">Hint {i + 1}</div>
+                <li
+                  key={i}
+                  className="animate-in fade-in slide-in-from-left-2 bg-card p-4 pixel-box"
+                >
+                  <div className="mb-1 font-pixel text-[10px] uppercase text-primary">
+                    Hint {i + 1}
+                  </div>
                   <p className="text-lg">{h}</p>
                 </li>
               ))}
@@ -191,7 +266,13 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
                 Answer: {result.answer}
               </div>
             )}
-            {!showAnswer && revealed < result.hints.length && <AnswerChecker answer={result.answer} problemId={bankProblemId} />}
+            {!showAnswer && (
+              <AnswerChecker
+                key={bankProblemId ?? problem}
+                answer={result.answer}
+                problemId={bankProblemId}
+              />
+            )}
           </div>
         )}
       </section>
@@ -209,8 +290,14 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
                 variant={speaking ? "accent" : "secondary"}
                 onClick={() => {
                   if (speaking) return stopSpeaking();
-                  const latest = result && revealed > 0 ? ` Hint ${revealed}. ${result.hints[revealed - 1]}` : "";
-                  const gimmick = result && revealed === 0 ? ` The gimmick: ${result.gimmick}` : "";
+                  const latest =
+                    result && revealed > 0
+                      ? ` Hint ${revealed}. ${result.hints[revealed - 1]}`
+                      : "";
+                  const gimmick =
+                    result && showGimmick && revealed === 0
+                      ? ` The gimmick: ${result.gimmick}`
+                      : "";
                   void speak(speech + gimmick + latest);
                 }}
                 aria-label={speaking ? "Stop speaking" : "Read aloud"}
@@ -234,13 +321,22 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
             </div>
             <div className="absolute -bottom-3 left-1/2 h-0 w-0 -translate-x-1/2 border-x-[12px] border-t-[12px] border-x-transparent border-t-border" />
           </div>
-          <img
-            src={geckoImg}
-            alt="Gimmick Gecko mascot"
-            width={1024}
-            height={1024}
-            className={`pixelated w-56 ${loading ? "animate-gecko" : ""}`}
-          />
+          <button
+            type="button"
+            disabled={!result}
+            onClick={() => setShowGimmick((v) => !v)}
+            aria-expanded={!!result && showGimmick}
+            aria-label="Show or hide the gecko's gimmick"
+            className="rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+          >
+            <img
+              src={geckoImg}
+              alt="Gimmick Gecko mascot"
+              width={1024}
+              height={1024}
+              className={`pixelated w-56 ${loading ? "animate-gecko" : ""}`}
+            />
+          </button>
         </div>
       </aside>
     </div>

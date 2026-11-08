@@ -1,23 +1,28 @@
 import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
 import { generateHints } from "./hints.server";
+import { hintInputSchema } from "./hints-schema";
 
 export const getHints = createServerFn({ method: "POST" })
-  .inputValidator((data) =>
-    z
-      .object({
-        problem: z.string().max(5000),
-        imageDataUrl: z
-          .string()
-          .max(6_000_000)
-          .regex(/^data:image\/(png|jpe?g|webp|gif);base64,/)
-          .optional(),
-      })
-      .refine((d) => d.problem.trim() || d.imageDataUrl, "Add a problem or an image.")
-      .parse(data),
-  )
+  .inputValidator((data: unknown) => hintInputSchema.parse(data))
   .handler(async ({ data }) => {
     try {
+      if (data.problemId) {
+        const { publicDatabase } = await import("./public-db.server");
+        const { data: bank, error } = await publicDatabase()
+          .from("problems")
+          .select("statement,answer")
+          .eq("id", data.problemId)
+          .single();
+        if (error || !bank)
+          return {
+            ok: false as const,
+            error: "That bank problem could not be found. Reopen it from the problem bank.",
+          };
+        return {
+          ok: true as const,
+          result: await generateHints({ problem: bank.statement, knownAnswer: bank.answer }),
+        };
+      }
       return { ok: true as const, result: await generateHints(data) };
     } catch (e) {
       console.error("hint generation failed", e);
