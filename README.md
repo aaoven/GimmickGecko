@@ -10,7 +10,7 @@ Nowadays math contests revolve less around pure logic and problem-solving abilit
 
 Gimmick Gecko combines the best of both worlds: identifying the key “gimmicks” and concepts behind math problems while clearly explaining the logic and reasoning needed to solve them. With personalized feedback, beginner-friendly explanations, and your very own gecko mascot guiding you along the way, you'll learn not just how to solve problems, but how to think through them.
 
-#### Navigating Gimmick Gecko 🧭:
+# Navigating Gimmick Gecko 🧭:
 
 ### Account Login 🔒
 
