@@ -8,6 +8,7 @@
 - [x] Fix speech endpoint crash when playback is stopped mid-request (abort now returns quietly instead of erroring); verified no overlay in the preview.
 
 # Skillset dashboard
+- [x] Replace attempt accuracy with earned/possible stars per distinct attempted question (best score); hint usage persists across bank, gecko and recommendations. Signed-in verification: two-star question earns 2/2 without hints and 1/2 after one hint; returning to bank retains deduction. Legacy correct answers treated as no-hint scores because prior hint counts were not recorded.
 - [x] Record signed-in users' answer checks on bank problems and show an AREDL-style per-concept breakdown (correct/missed bars + accuracy) on the account page; verified end-to-end signed in.
 - [x] Recommend bank problems at the bottom of the account page based on weakest concepts; excludes solved problems and refreshes live after answer checks; verified signed in (wrong answer keeps card, correct answer removes it and updates the graph).
 

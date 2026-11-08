@@ -2,6 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { listProblems } from "@/lib/problems.functions";
+import { useServerFn } from "@tanstack/react-start";
+import { useAccount } from "@/components/AccountSession";
+import { saveProblemHelp } from "@/lib/attempts.functions";
+import { toast } from "sonner";
 import { AnswerChecker } from "@/components/AnswerChecker";
 import { DifficultyStars } from "@/components/DifficultyStars";
 import { buttonVariants } from "@/components/ui/button";
@@ -24,6 +28,8 @@ export const Route = createFileRoute("/problems")({
 });
 
 function ProblemsPage() {
+  const saveHelp = useServerFn(saveProblemHelp);
+  const { user } = useAccount();
   const { data: problems } = useSuspenseQuery(problemsQuery);
   const [selected, setSelected] = useState<string[]>([]);
   const [contest, setContest] = useState("All");
@@ -116,11 +122,17 @@ function ProblemsPage() {
                 ))}
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <Link to="/" search={{ problem: p.statement }} className={buttonVariants({ size: "sm" })}>
+                <Link to="/" search={{ problem: p.statement, problemId: p.id }} className={buttonVariants({ size: "sm" })}>
                   Get gecko hints
                 </Link>
                 <button
-                  onClick={() => setOpenAnswer(openAnswer === p.id ? null : p.id)}
+                  onClick={async () => {
+                    if (openAnswer === p.id) { setOpenAnswer(null); return; }
+                    try {
+                      if (user) await saveHelp({ data: { problemId: p.id, hints: 0, answerRevealed: true } });
+                      setOpenAnswer(p.id);
+                    } catch { toast.error("Could not save answer reveal. Try again."); }
+                  }}
                   className={buttonVariants({ size: "sm", variant: "secondary" })}
                 >
                   {openAnswer === p.id ? `Answer: ${p.answer}` : "Show answer"}
