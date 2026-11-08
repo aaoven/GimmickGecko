@@ -50,6 +50,13 @@
       "when": 1794113014402,
       "tag": "0006_custom_problems",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794121134080,
+      "tag": "0007_deduct_stars_for_incorrect_answers",
+      "breakpoints": true
     }
   ]
 }

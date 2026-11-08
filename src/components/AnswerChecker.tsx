@@ -67,7 +67,7 @@ export function AnswerChecker({ answer, problemId, customId, onChecked, disabled
       {error && <p role="alert" className="text-destructive">{error}</p>}
       {result === "wrong" && (
         <p role="status" className="text-destructive">
-          Not quite — try again, or ask the gecko for a hint.
+          Not quite — one available star deducted (minimum 0). Try again.
         </p>
       )}
     </form>

@@ -2,7 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { generateHints } from "./hints.server";
 import { isCorrectAnswer } from "./answers";
-import { starsForAnswer } from "./skills";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const hintInput = z
@@ -83,8 +82,8 @@ export const checkCustomAnswer = createServerFn({ method: "POST" })
     const { data: row } = await supabaseAdmin.from("custom_problems").select("*").eq("id", data.id).eq("user_id", context.userId).single();
     if (!row) throw new Error("Problem not found.");
     const correct = isCorrectAnswer(data.answer, row.answer);
-    const earned = row.answer_revealed ? 0 : starsForAnswer(row.difficulty, row.hints_revealed, correct);
-    const best = Math.max(row.earned_stars, earned);
-    await supabaseAdmin.from("custom_problems").update({ attempted: true, solved: row.solved || correct, earned_stars: best }).eq("id", data.id);
-    return { correct, earnedStars: earned, possibleStars: row.difficulty };
+    const { data: graded, error } = await supabaseAdmin.rpc("grade_custom_answer", { _id: data.id, _user_id: context.userId, _correct: correct });
+    const score = graded?.[0];
+    if (error || !score) throw new Error("Your answer could not be saved.");
+    return { correct: score.correct, earnedStars: score.earned_stars, possibleStars: score.possible_stars };
   });

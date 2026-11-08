@@ -90,11 +90,11 @@ export function computeStarBreakdown(attempts: StarAttempt[]): ConceptStars[] {
 }
 
 /** Stars a correct answer earns: the rating minus one per hint, never below zero. */
-export function starsForAnswer(rating: number, hints: number, correct: boolean): number {
-  return correct ? Math.max(0, rating - hints) : 0;
+export function starsForAnswer(rating: number, hints: number, correct: boolean, incorrectAnswers = 0): number {
+  return correct ? Math.max(0, rating - hints - incorrectAnswers) : 0;
 }
 
 /** Solved and answer-revealed bank questions never offer additional stars. */
-export function availableProblemStars(rating: number, hints: number, solved: boolean, answerRevealed: boolean): number {
-  return starsForAnswer(rating, hints, !solved && !answerRevealed);
+export function availableProblemStars(rating: number, hints: number, solved: boolean, answerRevealed: boolean, incorrectAnswers = 0): number {
+  return starsForAnswer(rating, hints, !solved && !answerRevealed, incorrectAnswers);
 }

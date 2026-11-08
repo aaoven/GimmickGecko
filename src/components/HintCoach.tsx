@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { ImagePlus, Loader2, Square, Star, Volume2, VolumeX, X } from "lucide-react";
 import { streamSpeech } from "@/lib/stream-speech";
 import { toast } from "sonner";
@@ -7,7 +8,7 @@ import geckoImg from "@/assets/gecko.png";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { AnswerChecker } from "@/components/AnswerChecker";
 import { useAccount } from "@/components/AccountSession";
-import { saveProblemHelp } from "@/lib/attempts.functions";
+import { getBankProgress, saveProblemHelp } from "@/lib/attempts.functions";
 import { getHints, saveCustomHelp } from "@/lib/hints.functions";
 import type { HintResult } from "@/lib/hints.server";
 import { starsForAnswer } from "@/lib/skills";
@@ -20,6 +21,8 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
   const [problem, setProblem] = useState(initialProblem);
   const [image, setImage] = useState<string | undefined>();
   const bankProblemId = problem === initialProblem && !image ? problemId : undefined;
+  const loadProgress = useServerFn(getBankProgress);
+  const progress = useQuery({ queryKey: ["bank-progress", user?.id], queryFn: () => loadProgress(), enabled: !!user && !!bankProblemId });
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<HintResult | null>(null);
   const [customId, setCustomId] = useState<string | null>(null);
@@ -27,6 +30,8 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
   const [revealed, setRevealed] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [answerWasRevealed, setAnswerWasRevealed] = useState(false);
+  const [incorrectAnswers, setIncorrectAnswers] = useState(0);
+  const [solved, setSolved] = useState(false);
   const [voiceOn, setVoiceOn] = useState(true);
   const [speaking, setSpeaking] = useState(false);
   const speechCtrl = useRef<AbortController | null>(null);
@@ -101,6 +106,8 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
     setRevealed(0);
     setShowAnswer(false);
     setAnswerWasRevealed(false);
+    setIncorrectAnswers(0);
+    setSolved(false);
     setCustomId(null);
     try {
       const res = await fetchHints({ data: { problem, imageDataUrl: image, track: !!user && !bankProblemId } });
@@ -122,6 +129,9 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
         : revealed < result.hints.length
           ? "Keep going — try it before the next hint!"
           : "That's all my hints. You've got this!";
+
+  const bankHelp = progress.data?.help.find((row) => row.problem_id === bankProblemId);
+  const availableStars = result ? starsForAnswer(result.difficulty, Math.max(revealed, bankHelp?.hints_revealed ?? 0), !answerWasRevealed && !bankHelp?.answer_revealed && !solved && !(bankProblemId && progress.data?.solved.includes(bankProblemId)), Math.max(incorrectAnswers, bankProblemId ? progress.data?.incorrect[bankProblemId] ?? 0 : 0)) : 0;
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
@@ -198,7 +208,7 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
               </Button>
               <div role="status" aria-live="polite" aria-atomic="true" className="flex min-h-11 items-center gap-2 text-sm text-muted-foreground">
                 <Star aria-hidden="true" className="h-5 w-5 shrink-0 fill-accent text-accent" />
-                <span><strong className="tabular-nums text-accent">{starsForAnswer(result.difficulty, revealed, !answerWasRevealed)}</strong> {starsForAnswer(result.difficulty, revealed, !answerWasRevealed) === 1 ? "star" : "stars"} for a correct answer</span>
+                <span><strong className="tabular-nums text-accent">{availableStars}</strong> {availableStars === 1 ? "star" : "stars"} for a correct answer</span>
               </div>
             </div>
             {showAnswer && (
@@ -206,7 +216,7 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
                 Answer: {result.answer}
               </div>
             )}
-            {!showAnswer && revealed < result.hints.length && <AnswerChecker answer={result.answer} problemId={bankProblemId} customId={bankProblemId ? undefined : customId} />}
+            {!showAnswer && revealed < result.hints.length && <AnswerChecker answer={result.answer} problemId={bankProblemId} customId={bankProblemId ? undefined : customId} onChecked={(correct) => { if (correct) setSolved(true); else setIncorrectAnswers((count) => count + 1); }} />}
           </div>
         )}
       </section>

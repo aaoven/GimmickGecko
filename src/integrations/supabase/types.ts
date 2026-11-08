@@ -70,6 +70,7 @@ export type Database = {
           earned_stars: number
           hints_revealed: number
           id: string
+          incorrect_answers: number
           solved: boolean
           statement: string
           topic: string
@@ -85,6 +86,7 @@ export type Database = {
           earned_stars?: number
           hints_revealed?: number
           id?: string
+          incorrect_answers?: number
           solved?: boolean
           statement?: string
           topic?: string
@@ -100,6 +102,7 @@ export type Database = {
           earned_stars?: number
           hints_revealed?: number
           id?: string
+          incorrect_answers?: number
           solved?: boolean
           statement?: string
           topic?: string
@@ -216,6 +219,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      grade_custom_answer: {
+        Args: { _correct: boolean; _id: string; _user_id: string }
+        Returns: {
+          correct: boolean
+          earned_stars: number
+          possible_stars: number
+        }[]
+      }
       save_problem_help: {
         Args: {
           _answer_revealed?: boolean

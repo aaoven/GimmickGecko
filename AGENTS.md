@@ -39,3 +39,4 @@ use the editor.
 - Bank practice uses an inline per-question control and user-keyed server progress queries; saved help and successful attempts determine available stars, and previously solved answers return no additional award.
 - Skill and recommendation reads merge persisted answer reveals as zero-score practice only for bank questions absent from attempts; this counts possible stars once without fabricated answer attempts or overwriting earned stars.
 - Keep the full star-scoring explanation on the dedicated `/stars` route, linked beside the account skillset breakdown rather than from home, so guidance is available where users view their stars.
+- Wrong-answer scoring uses serialized database grading (bank trigger and custom grading RPC); numeric equivalence uses a bounded mathjs expression allowlist, so deductions persist and unsafe expressions are rejected.

@@ -19,3 +19,8 @@
 - [x] Show 1–5 star difficulty on every problem; all 12 bank problems rated, 1–5 range enforced in the database, star display verified in the preview.
 - [x] Let users submit an answer on each problem card and see correct/try-again feedback; verified in the preview.
 - [x] Add the same answer box below the gecko's hints on the homepage; verified correct/try-again against the gecko's answer. Box hides once the answer is revealed or all hints are out; verified.
+
+# Answer scoring and available-star filtering
+- [x] Persist one-star wrong-answer deductions for bank and custom questions and refresh skill totals; signed-in bank reward changed 2 to 1 after a miss, survived reload, and skill totals changed 0/2 to 1/2 after a correct answer. Custom one-star miss persisted zero available stars.
+- [x] Accept equivalent numeric math formats, including root 3 and sqrt(3); signed-in root answer and 1780/2 accepted, with 64 tests passing.
+- [x] Filter bank questions by remaining available stars, keeping concept counts accurate; solved question disappears under Stars remaining and phone view has no overflow.

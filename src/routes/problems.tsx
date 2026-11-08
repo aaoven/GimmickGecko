@@ -8,6 +8,8 @@ import { getBankProgress } from "@/lib/attempts.functions";
 import { BankProblemPractice } from "@/components/BankProblemPractice";
 import { DifficultyStars } from "@/components/DifficultyStars";
 import { MathText } from "@/components/MathText";
+import { Button } from "@/components/ui/button";
+import { hasAvailableStars } from "@/lib/problem-filters";
 
 const problemsQuery = queryOptions({ queryKey: ["problems"], queryFn: () => listProblems() });
 
@@ -34,6 +36,7 @@ function ProblemsPage() {
   const [selected, setSelected] = useState<string[]>([]);
   const [contest, setContest] = useState("All");
   const [difficulty, setDifficulty] = useState(0);
+  const [onlyAvailable, setOnlyAvailable] = useState(false);
 
   const contests = useMemo(() => ["All", ...new Set(problems.map((p) => p.contest))], [problems]);
 
@@ -41,6 +44,7 @@ function ProblemsPage() {
     (p) =>
       (contest === "All" || p.contest === contest) &&
       (difficulty === 0 || p.difficulty === difficulty) &&
+      (!onlyAvailable || ((!user || progress.isSuccess) && hasAvailableStars(p, progress.data))) &&
       selected.every((c) => p.concepts.includes(c)),
   );
 
@@ -50,7 +54,7 @@ function ProblemsPage() {
     filtered.forEach((p) => p.concepts.forEach((c) => counts.set(c, (counts.get(c) ?? 0) + 1)));
     return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [problems, contest, difficulty, selected]);
+  }, [problems, contest, difficulty, selected, onlyAvailable, progress.data, progress.isSuccess, user]);
 
   const toggle = (c: string) =>
     setSelected((s) => (s.includes(c) ? s.filter((x) => x !== c) : [...s, c]));
@@ -62,6 +66,13 @@ function ProblemsPage() {
 
       <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
         <aside className="h-fit space-y-6 bg-card p-4 pixel-box lg:sticky lg:top-6">
+          <div>
+            <div className="mb-2 font-pixel text-[10px] uppercase text-muted-foreground">Available stars</div>
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" variant={!onlyAvailable ? "default" : "secondary"} aria-pressed={!onlyAvailable} onClick={() => setOnlyAvailable(false)}>All questions</Button>
+              <Button size="sm" variant={onlyAvailable ? "default" : "secondary"} aria-pressed={onlyAvailable} onClick={() => setOnlyAvailable(true)}>Stars remaining</Button>
+            </div>
+          </div>
           <div>
             <div className="mb-2 font-pixel text-[10px] uppercase text-muted-foreground">Contest</div>
             <div className="flex flex-wrap gap-2">
@@ -148,6 +159,7 @@ function ProblemsPage() {
                 hintsUsed={progress.data?.help.find((h) => h.problem_id === p.id)?.hints_revealed ?? 0}
                 answerRevealed={progress.data?.help.find((h) => h.problem_id === p.id)?.answer_revealed ?? false}
                 solved={progress.data?.solved.includes(p.id) ?? false}
+                incorrectAnswers={progress.data?.incorrect[p.id] ?? 0}
                 ready={!user || progress.isSuccess}
               />
             </article>

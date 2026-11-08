@@ -108,8 +108,12 @@ export const getBankProgress = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const [help, attempts] = await Promise.all([
       context.supabase.from("problem_help").select("problem_id, hints_revealed, answer_revealed").eq("user_id", context.userId),
-      context.supabase.from("attempts").select("problem_id").eq("user_id", context.userId).eq("correct", true),
+      context.supabase.from("attempts").select("problem_id, correct").eq("user_id", context.userId),
     ]);
     if (help.error || attempts.error) throw new Error("Your problem progress could not be loaded.");
-    return { help: help.data ?? [], solved: [...new Set((attempts.data ?? []).map((row) => row.problem_id))] };
+    const incorrect: Record<string, number> = {};
+    for (const row of attempts.data ?? []) {
+      if (!row.correct) incorrect[row.problem_id] = (incorrect[row.problem_id] ?? 0) + 1;
+    }
+    return { help: help.data ?? [], solved: [...new Set((attempts.data ?? []).filter((row) => row.correct).map((row) => row.problem_id))], incorrect };
   });

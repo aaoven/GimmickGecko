@@ -48,7 +48,7 @@ function StarsPage() {
           <div>
             <h3 className="mb-2 font-semibold text-foreground">One question, one reward</h3>
             <p className="leading-relaxed text-muted-foreground">
-              Wrong answer? Try again. Solved questions earn no extra stars. Revealing an answer leaves <strong className="text-highlight">0 stars available</strong> permanently; earned stars stay yours.
+              Each wrong answer costs <strong className="text-accent">1 available star</strong>, never below zero. Try again for the rest. Solved questions earn no extra stars; revealing answers leaves 0 available. Earned stars stay yours.
             </p>
           </div>
           <div>

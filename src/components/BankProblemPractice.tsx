@@ -13,8 +13,8 @@ import { availableProblemStars } from "@/lib/skills";
 import type { Problem } from "@/lib/problems.functions";
 import gecko from "@/assets/gecko.png";
 
-export function BankProblemPractice({ problem, hintsUsed, answerRevealed, solved, ready }: {
-  problem: Problem; hintsUsed: number; answerRevealed: boolean; solved: boolean; ready: boolean;
+export function BankProblemPractice({ problem, hintsUsed, answerRevealed, solved, ready, incorrectAnswers = 0 }: {
+  problem: Problem; hintsUsed: number; answerRevealed: boolean; solved: boolean; ready: boolean; incorrectAnswers?: number;
 }) {
   const { user } = useAccount();
   const queryClient = useQueryClient();
@@ -25,13 +25,14 @@ export function BankProblemPractice({ problem, hintsUsed, answerRevealed, solved
   const [gimmick, setGimmick] = useState("");
   const [localHints, setLocalHints] = useState(0);
   const [localSolved, setLocalSolved] = useState(false);
+  const [localIncorrect, setLocalIncorrect] = useState(incorrectAnswers);
   const [revealedAnswer, setRevealedAnswer] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
   const [busy, setBusy] = useState(false);
   const used = Math.max(hintsUsed, localHints);
   const shown = answerRevealed || revealedAnswer;
   const completed = solved || localSolved;
-  const stars = availableProblemStars(problem.difficulty, used, completed, shown);
+  const stars = availableProblemStars(problem.difficulty, used, completed, shown, Math.max(incorrectAnswers, localIncorrect));
 
   async function reveal(answer = false) {
     if (busy || !ready) return;
@@ -81,6 +82,6 @@ export function BankProblemPractice({ problem, hintsUsed, answerRevealed, solved
       <ol aria-live="polite" className="space-y-3">{hints.slice(0, visibleHints).map((hint, i) => <li key={i} className="border-l-2 border-primary pl-3"><div className="mb-1 font-pixel text-[9px] text-primary">Hint {i + 1}</div><p className="break-words text-lg"><MathText text={hint} /></p></li>)}</ol>
     </div>}
     {showAnswer && <p className="mt-4 break-words text-lg text-primary" role="status">Answer: <MathText text={problem.answer ?? "Unavailable"} /></p>}
-    {!showAnswer && <AnswerChecker answer={problem.answer} problemId={problem.id} disabled={!ready || busy} onChecked={(correct) => { if (correct) setLocalSolved(true); }} />}
+    {!showAnswer && <AnswerChecker answer={problem.answer} problemId={problem.id} disabled={!ready || busy} onChecked={(correct) => { if (correct) setLocalSolved(true); else setLocalIncorrect(Math.max(incorrectAnswers, localIncorrect) + 1); }} />}
   </>;
 }

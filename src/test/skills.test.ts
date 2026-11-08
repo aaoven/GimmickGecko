@@ -67,6 +67,11 @@ describe("revealed answers in skill totals", () => {
 });
 
 describe("available bank stars", () => {
+  it("deducts one per incorrect answer on top of hints, never below zero", () => {
+    expect(availableProblemStars(3, 1, false, false, 1)).toBe(1);
+    expect(availableProblemStars(1, 0, false, false, 2)).toBe(0);
+    expect(starsForAnswer(3, 0, true, 1)).toBe(2);
+  });
   it("offers the rated stars minus one per hint", () => {
     expect(availableProblemStars(5, 2, false, false)).toBe(3);
     expect(availableProblemStars(1, 1, false, false)).toBe(0);
