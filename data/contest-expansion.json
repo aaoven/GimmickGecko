@@ -1,0 +1,86 @@
+[
+  {
+    "contest": "Euclid", "year": 2023, "problem_number": 1,
+    "statement": "Part (a): The average of n, 2n, 3n, 4n, 5n is 18. What is the value of n?",
+    "answer": "6", "concepts": ["Algebra", "Averages"], "difficulty": 1,
+    "source": "https://cemc.uwaterloo.ca/sites/default/files/documents/2023/2023EuclidContest.pdf",
+    "solution": "https://cemc.uwaterloo.ca/sites/default/files/documents/2023/2023EuclidSolution.pdf"
+  },
+  {
+    "contest": "Euclid", "year": 2023, "problem_number": 3,
+    "statement": "Part (b): Fionn wrote 4 consecutive integers on a whiteboard. Lexi came along and erased one of the integers. Fionn noticed that the sum of the remaining integers was 847. What integer did Lexi erase?",
+    "answer": "283", "concepts": ["Algebra", "Casework", "Number Theory"], "difficulty": 2,
+    "source": "https://cemc.uwaterloo.ca/sites/default/files/documents/2023/2023EuclidContest.pdf",
+    "solution": "https://cemc.uwaterloo.ca/sites/default/files/documents/2023/2023EuclidSolution.pdf"
+  },
+  {
+    "contest": "Euclid", "year": 2024, "problem_number": 3,
+    "statement": "Part (b): A bicycle costs $B before taxes. If the sales tax were 13%, Annemiek would pay a total that is $24 higher than if the sales tax were 5%. What is the value of B?",
+    "answer": "300", "concepts": ["Algebra", "Percentages"], "difficulty": 2,
+    "source": "https://cemc.uwaterloo.ca/sites/default/files/documents/2024/2024EuclidContest.pdf",
+    "solution": "https://cemc.uwaterloo.ca/sites/default/files/documents/2024/2024EuclidSolution.pdf"
+  },
+  {
+    "contest": "CEMC Fermat", "year": 2024, "problem_number": 3,
+    "statement": "How many solid 1 × 1 × 1 cubes are required to make a solid 2 × 2 × 2 cube?",
+    "answer": "8", "concepts": ["Geometry", "Volume"], "difficulty": 1,
+    "source": "https://cemc.uwaterloo.ca/sites/default/files/documents/2024/2024FermatContest.pdf",
+    "solution": "https://cemc.uwaterloo.ca/sites/default/files/documents/2024/2024FermatSolution.pdf"
+  },
+  {
+    "contest": "CEMC Fermat", "year": 2024, "problem_number": 6,
+    "statement": "How many integers are greater than √15 and less than √50?",
+    "answer": "4", "concepts": ["Number Theory", "Counting", "Square Roots"], "difficulty": 2,
+    "source": "https://cemc.uwaterloo.ca/sites/default/files/documents/2024/2024FermatContest.pdf",
+    "solution": "https://cemc.uwaterloo.ca/sites/default/files/documents/2024/2024FermatSolution.pdf"
+  },
+  {
+    "contest": "CEMC Fermat", "year": 2024, "problem_number": 8,
+    "statement": "If 10ⁿ = 1000²⁰, what is the value of n?",
+    "answer": "60", "concepts": ["Algebra", "Exponents"], "difficulty": 2,
+    "source": "https://cemc.uwaterloo.ca/sites/default/files/documents/2024/2024FermatContest.pdf",
+    "solution": "https://cemc.uwaterloo.ca/sites/default/files/documents/2024/2024FermatSolution.pdf"
+  },
+  {
+    "contest": "AMC 10A", "year": 2022, "problem_number": 2,
+    "statement": "Mike cycled 15 laps in 57 minutes. Assume he cycled at a constant speed throughout. Approximately how many laps did he complete in the first 27 minutes?",
+    "answer": "7", "concepts": ["Rates", "Proportions", "Estimation"], "difficulty": 1,
+    "source": "https://maa.org/wp-content/uploads/2024/08/2022_AMC10A-Problems.pdf",
+    "solution": "https://maa.org/wp-content/uploads/2024/08/2022-AMC-10A-solutions.pdf"
+  },
+  {
+    "contest": "AMC 10A", "year": 2022, "problem_number": 3,
+    "statement": "The sum of three numbers is 96. The first number is 6 times the third number, and the third number is 40 less than the second number. What is the absolute value of the difference between the first and second numbers?",
+    "answer": "5", "concepts": ["Algebra", "Absolute Value"], "difficulty": 2,
+    "source": "https://maa.org/wp-content/uploads/2024/08/2022_AMC10A-Problems.pdf",
+    "solution": "https://maa.org/wp-content/uploads/2024/08/2022-AMC-10A-solutions.pdf"
+  },
+  {
+    "contest": "AMC 10A", "year": 2022, "problem_number": 7,
+    "statement": "The least common multiple of a positive integer and 18 is 180, and the greatest common divisor of the integer and 45 is 15. What is the sum of the digits of the integer?",
+    "answer": "6", "concepts": ["Number Theory", "Divisibility", "Digits"], "difficulty": 3,
+    "source": "https://maa.org/wp-content/uploads/2024/08/2022_AMC10A-Problems.pdf",
+    "solution": "https://maa.org/wp-content/uploads/2024/08/2022-AMC-10A-solutions.pdf"
+  },
+  {
+    "contest": "COMC", "year": 2021, "problem_number": 1,
+    "statement": "Part A: Let x be a real number such that (x − 2)(x + 2) = 2021. Determine the value of (x − 1)(x + 1).",
+    "answer": "2024", "concepts": ["Algebra", "Factoring", "Substitution"], "difficulty": 1,
+    "source": "https://cms.math.ca/wp-content/uploads/2024/06/comc2021-exam-en.pdf",
+    "solution": "https://cms.math.ca/wp-content/uploads/2024/06/comc2021-official-solutions-en.pdf"
+  },
+  {
+    "contest": "COMC", "year": 2018, "problem_number": 1,
+    "statement": "Part A: Suppose x is a real number such that x(x + 3) = 154. Determine the value of (x + 1)(x + 2).",
+    "answer": "156", "concepts": ["Algebra", "Factoring", "Substitution"], "difficulty": 1,
+    "source": "https://cms.math.ca/wp-content/uploads/2024/06/comc2018-official-solutions-en.pdf",
+    "solution": "https://cms.math.ca/wp-content/uploads/2024/06/comc2018-official-solutions-en.pdf"
+  },
+  {
+    "contest": "COMC", "year": 2023, "problem_number": 1,
+    "statement": "Part A: Ty took a positive number, squared it, then divided it by 3, then cubed it, and finally divided it by 9. In the end he received the same number as he started with. What was the number?",
+    "answer": "3", "concepts": ["Algebra", "Exponents"], "difficulty": 2,
+    "source": "https://cms.math.ca/wp-content/uploads/2024/01/comc2023-official-solutions-en.pdf",
+    "solution": "https://cms.math.ca/wp-content/uploads/2024/01/comc2023-official-solutions-en.pdf"
+  }
+]

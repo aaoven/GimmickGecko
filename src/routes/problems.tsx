@@ -16,7 +16,7 @@ export const Route = createFileRoute("/problems")({
   head: () => ({
     meta: [
       { title: "Problem Bank — Gimmick Gecko" },
-      { name: "description", content: "Browse past AIME and contest problems filtered by the concepts needed to solve them." },
+      { name: "description", content: "Browse AIME, AMC, Euclid, CEMC Fermat and COMC problems filtered by the concepts needed to solve them." },
       { property: "og:title", content: "Problem Bank — Gimmick Gecko" },
       { property: "og:description", content: "Filter past contest problems by concept and practice with gecko hints." },
       { property: "og:type", content: "website" },

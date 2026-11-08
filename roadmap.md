@@ -13,6 +13,7 @@
 - [x] Recommend bank problems at the bottom of the account page based on weakest concepts; excludes solved problems and refreshes live after answer checks; verified signed in (wrong answer keeps card, correct answer removes it and updates the graph).
 
 # Problem bank difficulty
+- [x] Add 12 sourced questions (three each from Euclid, CEMC Fermat, AMC 10A and COMC), bringing the bank to 24; contest + concept filters, signed-in answer checks and mobile layout verified. Source records and numeric-answer tests retained.
 - [x] Show 1–5 star difficulty on every problem; all 12 bank problems rated, 1–5 range enforced in the database, star display verified in the preview.
 - [x] Let users submit an answer on each problem card and see correct/try-again feedback; verified in the preview.
 - [x] Add the same answer box below the gecko's hints on the homepage; verified correct/try-again against the gecko's answer. Box hides once the answer is revealed or all hints are out; verified.
