@@ -9,7 +9,7 @@ import { BankProblemPractice } from "@/components/BankProblemPractice";
 import { DifficultyStars } from "@/components/DifficultyStars";
 import { MathText } from "@/components/MathText";
 import { Button } from "@/components/ui/button";
-import { hasAvailableStars } from "@/lib/problem-filters";
+import { remainingProblemStars } from "@/lib/problem-filters";
 
 const problemsQuery = queryOptions({ queryKey: ["problems"], queryFn: () => listProblems() });
 
@@ -36,7 +36,7 @@ function ProblemsPage() {
   const [selected, setSelected] = useState<string[]>([]);
   const [contest, setContest] = useState("All");
   const [difficulty, setDifficulty] = useState(0);
-  const [onlyAvailable, setOnlyAvailable] = useState(false);
+  const [remainingStars, setRemainingStars] = useState<number | null>(null);
 
   const contests = useMemo(() => ["All", ...new Set(problems.map((p) => p.contest))], [problems]);
 
@@ -44,7 +44,7 @@ function ProblemsPage() {
     (p) =>
       (contest === "All" || p.contest === contest) &&
       (difficulty === 0 || p.difficulty === difficulty) &&
-      (!onlyAvailable || ((!user || progress.isSuccess) && hasAvailableStars(p, progress.data))) &&
+      (remainingStars === null || ((!user || progress.isSuccess) && remainingProblemStars(p, progress.data) === remainingStars)) &&
       selected.every((c) => p.concepts.includes(c)),
   );
 
@@ -54,7 +54,7 @@ function ProblemsPage() {
     filtered.forEach((p) => p.concepts.forEach((c) => counts.set(c, (counts.get(c) ?? 0) + 1)));
     return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [problems, contest, difficulty, selected, onlyAvailable, progress.data, progress.isSuccess, user]);
+  }, [problems, contest, difficulty, selected, remainingStars, progress.data, progress.isSuccess, user]);
 
   const toggle = (c: string) =>
     setSelected((s) => (s.includes(c) ? s.filter((x) => x !== c) : [...s, c]));
@@ -69,8 +69,12 @@ function ProblemsPage() {
           <div>
             <div className="mb-2 font-pixel text-[10px] uppercase text-muted-foreground">Available stars</div>
             <div className="flex flex-wrap gap-2">
-              <Button size="sm" variant={!onlyAvailable ? "default" : "secondary"} aria-pressed={!onlyAvailable} onClick={() => setOnlyAvailable(false)}>All questions</Button>
-              <Button size="sm" variant={onlyAvailable ? "default" : "secondary"} aria-pressed={onlyAvailable} onClick={() => setOnlyAvailable(true)}>Stars remaining</Button>
+              <Button size="sm" variant={remainingStars === null ? "default" : "secondary"} aria-pressed={remainingStars === null} onClick={() => setRemainingStars(null)} className="text-[9px]">All questions</Button>
+              {[0, 1, 2, 3, 4, 5].map((stars) => (
+                <Button key={stars} size="sm" variant={remainingStars === stars ? "default" : "secondary"} aria-pressed={remainingStars === stars} onClick={() => setRemainingStars(stars)} className="text-[9px]">
+                  {stars} {stars === 1 ? "star" : "stars"} remaining
+                </Button>
+              ))}
             </div>
           </div>
           <div>
