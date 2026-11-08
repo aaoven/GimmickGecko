@@ -17,8 +17,6 @@ Gimmick Gecko combines the best of both worlds: identifying the key “gimmicks�
 Sign up or login with your email to receive personally tailored feedback, skillset breakdowns, and recommended problems.
 
 
-This project was built with [Lovable](https://lovable.dev).
-
 ### Home Page 🏠
 The Home page introduces Gimmick Gecko and its mission to help students improve their math competition skills. You can also access past problems, upload your own questions, and check your progress.
 
@@ -31,4 +29,7 @@ A bank filled with problems from multiple math contests. Filter by concept, diff
 
 ### Account Page 👤
 View and edit your account details and information! Also look at your skillset breakdown and recommended problem! 
+
+
+This project was built with [Lovable](https://lovable.dev).
 
