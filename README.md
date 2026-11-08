@@ -31,5 +31,5 @@ A bank filled with problems from multiple math contests. Filter by concept, diff
 View and edit your account details and information! Also look at your skillset breakdown and recommended problem! 
 
 
-This project was built with [Lovable](https://lovable.dev). 💞
+# This project was built with [Lovable](https://lovable.dev). 💞
 
