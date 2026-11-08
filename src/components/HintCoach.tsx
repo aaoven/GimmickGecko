@@ -120,15 +120,19 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
     }
   }
 
+  const notMath = result?.isMathProblem === false;
+
   const speech = loading
     ? "Hmm… let me scale this problem…"
     : !result
       ? "Feed me a contest problem! I'll drop hints one at a time."
-      : revealed === 0
-        ? `A ${result.topic} problem! Here's the gimmick. Want a hint?`
-        : revealed < result.hints.length
-          ? "Keep going — try it before the next hint!"
-          : "That's all my hints. You've got this!";
+      : notMath
+        ? "That's not a math problem, I can only teach math!"
+        : revealed === 0
+          ? `A ${result.topic} problem! Here's the gimmick. Want a hint?`
+          : revealed < result.hints.length
+            ? "Keep going — try it before the next hint!"
+            : "That's all my hints. You've got this!";
 
   const bankHelp = progress.data?.help.find((row) => row.problem_id === bankProblemId);
   const availableStars = result ? starsForAnswer(result.difficulty, Math.max(revealed, bankHelp?.hints_revealed ?? 0), !answerWasRevealed && !bankHelp?.answer_revealed && !solved && !(bankProblemId && progress.data?.solved.includes(bankProblemId)), Math.max(incorrectAnswers, bankProblemId ? progress.data?.incorrect[bankProblemId] ?? 0 : 0)) : 0;
@@ -172,7 +176,13 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
           </div>
         </div>
 
-        {result && (
+        {notMath && (
+          <div role="status" className="bg-card p-5 pixel-box">
+            <p className="text-lg">That's not a math problem, I can only teach math! Paste a contest problem or upload a photo of one.</p>
+          </div>
+        )}
+
+        {result && !notMath && (
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
               <span className="bg-secondary px-2 py-1 font-pixel text-[9px] uppercase" aria-label={`Difficulty ${result.difficulty} out of 5 stars`}>
@@ -234,8 +244,8 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
                 variant={speaking ? "accent" : "secondary"}
                 onClick={() => {
                   if (speaking) return stopSpeaking();
-                  const latest = result && revealed > 0 ? ` Hint ${revealed}. ${result.hints[revealed - 1]}` : "";
-                  const gimmick = result && revealed === 0 ? ` The gimmick: ${result.gimmick}` : "";
+                  const latest = result && !notMath && revealed > 0 ? ` Hint ${revealed}. ${result.hints[revealed - 1]}` : "";
+                  const gimmick = result && !notMath && revealed === 0 ? ` The gimmick: ${result.gimmick}` : "";
                   void speak(speech + gimmick + latest);
                 }}
                 aria-label={speaking ? "Stop speaking" : "Read aloud"}

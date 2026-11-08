@@ -36,7 +36,7 @@ export const getHints = createServerFn({ method: "POST" })
       const known = [...new Set((rows ?? []).flatMap((r) => r.concepts as string[]))].sort();
       const result = await generateHints(data, known);
       let customId: string | null = null;
-      const userId = data.track ? await optionalUserId() : null;
+      const userId = data.track && result.isMathProblem ? await optionalUserId() : null;
       if (userId) {
         const { data: row } = await supabaseAdmin
           .from("custom_problems")

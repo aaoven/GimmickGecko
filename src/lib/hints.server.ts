@@ -3,6 +3,7 @@ import { Output, streamText, type ModelMessage } from "ai";
 import { z } from "zod";
 
 export const hintSchema = z.object({
+  isMathProblem: z.boolean().describe("false when the input is not a math problem (gibberish, a non-math question, or an unrelated image); true otherwise"),
   topic: z.string().describe("Short name of the problem's main area, e.g. 'Number Theory'"),
   concepts: z.array(z.string()).describe("2-5 key concepts needed to solve it"),
   gimmick: z.string().describe("The single clever trick / gimmick that cracks the problem, in one sentence, without giving the answer"),
@@ -30,7 +31,7 @@ Given a problem (text and/or image), produce:
 - a difficulty rating from 1 (very easy) to 5 (very hard).
 For concepts, reuse names from this list whenever they fit, so practice is grouped consistently; only invent a new short name if none fit:
 {{CONCEPTS}}
-Be encouraging and concise. If the input is not a math problem, still respond with the schema and say so in the hints.`;
+Be encouraging and concise. If the input is not a math problem, set isMathProblem to false and fill the other fields with short placeholders; otherwise set it to true.`;
 
 export async function generateHints(input: { problem: string; imageDataUrl?: string | undefined }, knownConcepts: string[] = []): Promise<HintResult> {
   const apiKey = process.env["LOVABLE_API_KEY"];
