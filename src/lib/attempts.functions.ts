@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { recommendProblems, weakestConcepts } from "@/lib/recommendations";
+import type { Problem } from "@/lib/problems.functions";
 
 export const recordAttempt = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -25,4 +27,28 @@ export const getMyAttempts = createServerFn({ method: "GET" })
       correct: row.correct,
       concepts: (row.problems as unknown as { concepts: string[] } | null)?.concepts ?? [],
     }));
+  });
+
+export const getRecommendations = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: attempts, error: attemptsError } = await context.supabase
+      .from("attempts")
+      .select("problem_id, correct, problems(concepts)");
+    if (attemptsError) throw new Error("Your attempts could not be loaded.");
+    const { data: problems, error: problemsError } = await context.supabase
+      .from("problems")
+      .select("*")
+      .order("year", { ascending: true })
+      .order("problem_number", { ascending: true });
+    if (problemsError) throw new Error("Problems could not be loaded.");
+    const records = (attempts ?? []).map((row) => ({
+      problemId: row.problem_id,
+      correct: row.correct,
+      concepts: (row.problems as unknown as { concepts: string[] } | null)?.concepts ?? [],
+    }));
+    return {
+      weakest: weakestConcepts(records),
+      problems: recommendProblems(records, (problems ?? []) as Problem[]),
+    };
   });
