@@ -29,6 +29,7 @@ function ProblemsPage() {
   const { data: problems } = useSuspenseQuery(problemsQuery);
   const [selected, setSelected] = useState<string[]>([]);
   const [contest, setContest] = useState("All");
+  const [difficulty, setDifficulty] = useState(0);
   const [openAnswer, setOpenAnswer] = useState<string | null>(null);
 
   const concepts = useMemo(() => {
@@ -40,7 +41,9 @@ function ProblemsPage() {
 
   const filtered = problems.filter(
     (p) =>
-      (contest === "All" || p.contest === contest) && selected.every((c) => p.concepts.includes(c)),
+      (contest === "All" || p.contest === contest) &&
+      (difficulty === 0 || p.difficulty === difficulty) &&
+      selected.every((c) => p.concepts.includes(c)),
   );
 
   const toggle = (c: string) =>
@@ -63,6 +66,21 @@ function ProblemsPage() {
                   className={`px-2 py-1 font-pixel text-[9px] uppercase ${contest === c ? "bg-primary text-primary-foreground" : "bg-secondary"}`}
                 >
                   {c}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="mb-2 font-pixel text-[10px] uppercase text-muted-foreground">Difficulty</div>
+            <div className="flex flex-wrap gap-2">
+              {[0, 1, 2, 3, 4, 5].map((d) => (
+                <button
+                  key={d}
+                  onClick={() => setDifficulty(d)}
+                  aria-label={d === 0 ? "Any difficulty" : `Difficulty ${d} out of 5 stars`}
+                  className={`px-2 py-1 font-pixel text-[9px] ${difficulty === d ? "bg-primary text-primary-foreground" : "bg-secondary"}`}
+                >
+                  {d === 0 ? "All" : <span className={difficulty === d ? undefined : "text-accent"}>{"★".repeat(d)}</span>}
                 </button>
               ))}
             </div>
