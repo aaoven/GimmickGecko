@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { BarChart3, LogOut, Save, Target, UserRound } from "lucide-react";
+import { BarChart3, LogOut, Save, Star, Target, UserRound } from "lucide-react";
 import { getProfile, saveProfile } from "@/lib/account.functions";
 import { getMyAttempts, getRecommendations } from "@/lib/attempts.functions";
 import { computeStarBreakdown } from "@/lib/skills";
@@ -60,7 +60,12 @@ function AccountPage() {
     {query.isPending ? <p role="status">Loading your profile…</p> : query.isError ? <><p role="alert">Your profile couldn’t be loaded.</p><Button onClick={() => void query.refetch()}>Try again</Button></> : <form onSubmit={submit} className="space-y-5"><AccountField id="profile-username" label="Username" value={username} onChange={e => { setUsername(e.target.value); setSaved(false); }} maxLength={24} required /><AccountField id="profile-name" label="Display name" value={displayName} onChange={e => { setDisplayName(e.target.value); setSaved(false); }} maxLength={80} /><div className="space-y-2"><Label htmlFor="bio">About you</Label><Textarea id="bio" value={bio} onChange={e => { setBio(e.target.value); setSaved(false); }} maxLength={500} rows={4} className="bg-input" /></div><Button type="submit" disabled={busy}><Save />{busy ? "Please wait…" : "Save profile"}</Button></form>}
     {error && <p role="alert" className="mt-4 text-destructive">{error}</p>}{saved && <p role="status" className="mt-4 text-primary">Profile saved.</p>}
     <section className="mt-10 border-t-4 border-border pt-6">
-      <div className="mb-1 flex items-center gap-3"><BarChart3 className="h-6 w-6 text-accent" /><h2 className="font-pixel text-sm text-primary">Skillset breakdown</h2></div>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3"><BarChart3 aria-hidden="true" className="h-6 w-6 shrink-0 text-accent" /><h2 className="font-pixel text-sm leading-relaxed text-primary">Skillset breakdown</h2></div>
+        <Button asChild variant="outline" size="sm" className="h-auto min-h-9 whitespace-normal py-2">
+          <Link to="/stars"><Star aria-hidden="true" className="text-accent" /> How stars work</Link>
+        </Button>
+      </div>
       <p className="mb-5 text-sm text-muted-foreground">Stars earned from each question’s best score.</p>
       {attemptsQuery.isPending ? (
         <p role="status">Loading your skillset…</p>
