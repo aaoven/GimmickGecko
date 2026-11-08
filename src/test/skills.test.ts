@@ -49,6 +49,12 @@ describe("accuracy", () => {
 import { computeStarBreakdown, starsForAnswer } from "@/lib/skills";
 
 describe("star scoring", () => {
+  it("offers one star for a one-star question with zero hints", () => {
+    expect(starsForAnswer(1, 0, true)).toBe(1);
+  });
+  it("offers zero stars for a one-star question after one hint", () => {
+    expect(starsForAnswer(1, 1, true)).toBe(0);
+  });
   it("awards the problem's rating for a correct answer with no hints", () => {
     expect(starsForAnswer(3, 0, true)).toBe(3);
   });

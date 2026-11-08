@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ImagePlus, Loader2, Square, Volume2, VolumeX, X } from "lucide-react";
+import { ImagePlus, Loader2, Square, Star, Volume2, VolumeX, X } from "lucide-react";
 import { streamSpeech } from "@/lib/stream-speech";
 import { toast } from "sonner";
 import geckoImg from "@/assets/gecko.png";
@@ -10,6 +10,7 @@ import { useAccount } from "@/components/AccountSession";
 import { saveProblemHelp } from "@/lib/attempts.functions";
 import { getHints, saveCustomHelp } from "@/lib/hints.functions";
 import type { HintResult } from "@/lib/hints.server";
+import { starsForAnswer } from "@/lib/skills";
 
 export function HintCoach({ initialProblem = "", problemId }: { initialProblem?: string; problemId?: string | undefined }) {
   const { user } = useAccount();
@@ -25,6 +26,7 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
   const saveCustom = useServerFn(saveCustomHelp);
   const [revealed, setRevealed] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [answerWasRevealed, setAnswerWasRevealed] = useState(false);
   const [voiceOn, setVoiceOn] = useState(true);
   const [speaking, setSpeaking] = useState(false);
   const speechCtrl = useRef<AbortController | null>(null);
@@ -65,7 +67,7 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
     try {
       if (bankProblemId && user) await saveHelp({ data: { problemId: bankProblemId, hints: next, answerRevealed: answer } });
       else if (customId && user) await saveCustom({ data: { id: customId, hints: next, answerRevealed: answer } });
-      if (answer) setShowAnswer(true);
+      if (answer) { setShowAnswer(true); setAnswerWasRevealed(true); }
       else {
         setRevealed(next);
         if (voiceOn) void speak(`Hint ${next}. ${result.hints[revealed]}`);
@@ -98,6 +100,7 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
     setResult(null);
     setRevealed(0);
     setShowAnswer(false);
+    setAnswerWasRevealed(false);
     setCustomId(null);
     try {
       const res = await fetchHints({ data: { problem, imageDataUrl: image, track: !!user && !bankProblemId } });
@@ -184,7 +187,7 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
                 </li>
               ))}
             </ol>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               {revealed < result.hints.length && (
                 <Button onClick={() => void revealHelp()} disabled={savingHelp}>
                   Next hint ({revealed + 1}/{result.hints.length})
@@ -193,6 +196,10 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
               <Button variant="accent" onClick={() => void revealHelp(true)} disabled={savingHelp}>
                 {showAnswer ? "Hide answer" : "Reveal answer"}
               </Button>
+              <div role="status" aria-live="polite" aria-atomic="true" className="flex min-h-11 items-center gap-2 text-sm text-muted-foreground">
+                <Star aria-hidden="true" className="h-5 w-5 shrink-0 fill-accent text-accent" />
+                <span><strong className="tabular-nums text-accent">{starsForAnswer(result.difficulty, revealed, !answerWasRevealed)}</strong> {starsForAnswer(result.difficulty, revealed, !answerWasRevealed) === 1 ? "star" : "stars"} for a correct answer</span>
+              </div>
             </div>
             {showAnswer && (
               <div className="inline-block bg-primary px-4 py-3 font-pixel text-sm text-primary-foreground pixel-box">
