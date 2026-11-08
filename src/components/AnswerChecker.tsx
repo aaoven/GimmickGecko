@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
 import { isCorrectAnswer } from "@/lib/answers";
@@ -7,6 +7,8 @@ import { checkCustomAnswer } from "@/lib/hints.functions";
 import { useAccount } from "@/components/AccountSession";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { MathKeyboard } from "@/components/MathKeyboard";
+import { MathText } from "@/components/MathText";
 
 export function AnswerChecker({ answer, problemId, customId, onChecked, disabled = false }: { answer: string | null; problemId?: string | undefined; customId?: string | null | undefined; onChecked?: (correct: boolean) => void; disabled?: boolean }) {
   const [value, setValue] = useState("");
@@ -18,6 +20,23 @@ export function AnswerChecker({ answer, problemId, customId, onChecked, disabled
   const queryClient = useQueryClient();
   const record = useServerFn(recordAttempt);
   const checkCustom = useServerFn(checkCustomAnswer);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  /** Inserts a keyboard snippet at the cursor, leaving the cursor inside any placeholder braces. */
+  function insertSnippet(snippet: string, cursorBack: number) {
+    const input = inputRef.current;
+    const start = input?.selectionStart ?? value.length;
+    const end = input?.selectionEnd ?? start;
+    setValue(value.slice(0, start) + snippet + value.slice(end));
+    setResult(null);
+    setStars(null);
+    const position = start + snippet.length - cursorBack;
+    requestAnimationFrame(() => {
+      input?.focus();
+      input?.setSelectionRange(position, position);
+    });
+  }
+
   if (answer == null) return null;
   return (
     <form
@@ -46,6 +65,7 @@ export function AnswerChecker({ answer, problemId, customId, onChecked, disabled
       }}
     >
       <Input
+        ref={inputRef}
         value={value}
         onChange={(e) => {
           setValue(e.target.value);
@@ -54,11 +74,18 @@ export function AnswerChecker({ answer, problemId, customId, onChecked, disabled
         }}
         placeholder="Your answer"
         aria-label="Your answer"
-        className="h-9 w-40 bg-input"
+        className="h-9 w-40 bg-input sm:w-56"
       />
       <Button type="submit" size="sm" variant="secondary" disabled={disabled || busy || !value.trim()}>
         {busy ? "Saving…" : "Check answer"}
       </Button>
+      <MathKeyboard onInsert={insertSnippet} disabled={disabled || busy} />
+      {value.trim() && (
+        <div aria-live="polite" className="flex w-full items-baseline gap-2 text-lg text-muted-foreground">
+          <span className="shrink-0 font-pixel text-[9px] uppercase">Preview</span>
+          <MathText text={`$${value.replace(/\$/g, "")}$`} />
+        </div>
+      )}
       {result === "correct" && (
         <p role="status" className="font-pixel text-[10px] uppercase text-primary">
           Correct! {stars && `${stars.earned}/${stars.possible} stars`}
