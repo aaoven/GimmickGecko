@@ -7,10 +7,14 @@ import geckoImg from "@/assets/gecko.png";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { AnswerChecker } from "@/components/AnswerChecker";
 import { getHints } from "@/lib/hints.functions";
+import { saveProblemHelp } from "@/lib/attempts.functions";
+import { useAccount } from "@/components/AccountSession";
 import type { HintResult } from "@/lib/hints.server";
 
-export function HintCoach({ initialProblem = "" }: { initialProblem?: string }) {
+export function HintCoach({ initialProblem = "", problemId }: { initialProblem?: string; problemId?: string | undefined }) {
   const fetchHints = useServerFn(getHints);
+  const saveHelp = useServerFn(saveProblemHelp);
+  const { user } = useAccount();
   const [problem, setProblem] = useState(initialProblem);
   const [image, setImage] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
@@ -22,6 +26,13 @@ export function HintCoach({ initialProblem = "" }: { initialProblem?: string }) 
   const speechCtrl = useRef<AbortController | null>(null);
 
   useEffect(() => () => speechCtrl.current?.abort(), []);
+
+  // Only the untouched bank problem counts toward stars; edited text or photos are free practice.
+  const bankProblemId = problem === initialProblem && !image ? problemId : undefined;
+  function recordHelp(hints: number, answerRevealed: boolean) {
+    if (!bankProblemId || !user) return;
+    void saveHelp({ data: { problemId: bankProblemId, hints, answerRevealed } }).catch(() => undefined);
+  }
 
   function stopSpeaking() {
     speechCtrl.current?.abort();
@@ -53,6 +64,7 @@ export function HintCoach({ initialProblem = "" }: { initialProblem?: string }) 
     if (!result) return;
     const i = revealed;
     setRevealed(i + 1);
+    recordHelp(i + 1, showAnswer);
     if (voiceOn) void speak(`Hint ${i + 1}. ${result.hints[i]}`);
   }
 
@@ -167,7 +179,7 @@ export function HintCoach({ initialProblem = "" }: { initialProblem?: string }) 
                   Next hint ({revealed + 1}/{result.hints.length})
                 </Button>
               )}
-              <Button variant="accent" onClick={() => setShowAnswer((s) => !s)}>
+              <Button variant="accent" onClick={() => { if (!showAnswer) recordHelp(revealed, true); setShowAnswer((s) => !s); }}>
                 {showAnswer ? "Hide answer" : "Reveal answer"}
               </Button>
             </div>
@@ -176,7 +188,7 @@ export function HintCoach({ initialProblem = "" }: { initialProblem?: string }) 
                 Answer: {result.answer}
               </div>
             )}
-            {!showAnswer && revealed < result.hints.length && <AnswerChecker answer={result.answer} />}
+            {!showAnswer && revealed < result.hints.length && <AnswerChecker answer={result.answer} problemId={bankProblemId} />}
           </div>
         )}
       </section>

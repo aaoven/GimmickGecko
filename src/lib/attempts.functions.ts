@@ -52,3 +52,19 @@ export const getRecommendations = createServerFn({ method: "GET" })
       problems: recommendProblems(records, (problems ?? []) as Problem[]),
     };
   });
+
+/** Persists how much help (hints / answer reveal) the user used on a bank problem. Only ever increases. */
+export const saveProblemHelp = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ problemId: z.string().uuid(), hints: z.number().int().min(0).max(100), answerRevealed: z.boolean() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc("save_problem_help", {
+      _problem_id: data.problemId,
+      _hints: data.hints,
+      _answer_revealed: data.answerRevealed,
+    });
+    if (error) throw new Error("Hint usage could not be saved.");
+    return { ok: true as const };
+  });

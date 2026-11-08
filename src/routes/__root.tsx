@@ -132,23 +132,24 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AccountSession>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      <a href="#main-content" className="sr-only z-50 bg-primary px-4 py-2 font-pixel text-xs text-primary-foreground focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Skip to content</a>
       <header className="border-b-4 border-border bg-panel">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4">
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/" aria-label="Gimmick Gecko home" className="flex items-center gap-3">
             <img src={geckoImg} alt="" width={40} height={40} className="pixelated h-10 w-10" />
             <span className="font-pixel text-xs text-primary sm:text-sm">Gimmick Gecko</span>
           </Link>
-          <nav className="flex flex-wrap items-center gap-1 font-pixel text-[10px] uppercase">
+          <nav aria-label="Main" className="flex flex-wrap items-center gap-1 font-pixel text-[10px] uppercase">
             <Link
               to="/ask"
-              className="px-3 py-2 hover:bg-secondary"
+              className="inline-flex min-h-10 items-center px-3 py-2 hover:bg-secondary"
               activeProps={{ className: "bg-primary text-primary-foreground" }}
             >
               Ask the gecko
             </Link>
             <Link
               to="/problems"
-              className="px-3 py-2 hover:bg-secondary"
+              className="inline-flex min-h-10 items-center px-3 py-2 hover:bg-secondary"
               activeProps={{ className: "bg-primary text-primary-foreground" }}
             >
               Problems
@@ -157,7 +158,7 @@ function RootComponent() {
           </nav>
         </div>
       </header>
-      <Outlet />
+      <div id="main-content" tabIndex={-1} className="outline-none"><Outlet /></div>
       <Toaster />
       </AccountSession>
     </QueryClientProvider>

@@ -59,8 +59,10 @@ function ProblemsPage() {
               {contests.map((c) => (
                 <button
                   key={c}
+                  type="button"
+                  aria-pressed={contest === c}
                   onClick={() => setContest(c)}
-                  className={`px-2 py-1 font-pixel text-[9px] uppercase ${contest === c ? "bg-primary text-primary-foreground" : "bg-secondary"}`}
+                  className={`min-h-9 px-3 py-2 font-pixel text-[9px] uppercase ${contest === c ? "bg-primary text-primary-foreground" : "bg-secondary"}`}
                 >
                   {c}
                 </button>
@@ -71,7 +73,7 @@ function ProblemsPage() {
             <div className="mb-2 flex items-center justify-between font-pixel text-[10px] uppercase text-muted-foreground">
               Concepts
               {selected.length > 0 && (
-                <button onClick={() => setSelected([])} className="text-accent">
+                <button type="button" onClick={() => setSelected([])} className="min-h-9 px-2 text-accent underline">
                   Clear
                 </button>
               )}
@@ -80,10 +82,12 @@ function ProblemsPage() {
               {concepts.map(([c, n]) => (
                 <button
                   key={c}
+                  type="button"
+                  aria-pressed={selected.includes(c)}
                   onClick={() => toggle(c)}
-                  className={`px-2 py-1 text-sm ${selected.includes(c) ? "bg-accent text-accent-foreground" : "bg-secondary hover:brightness-125"}`}
+                  className={`min-h-9 px-3 py-1.5 text-sm ${selected.includes(c) ? "bg-accent text-accent-foreground" : "bg-secondary hover:brightness-125"}`}
                 >
-                  {c} <span className="opacity-60">{n}</span>
+                  {c} <span className="text-muted-foreground" aria-label={`${n} problems`}>{n}</span>
                 </button>
               ))}
             </div>
@@ -91,7 +95,7 @@ function ProblemsPage() {
         </aside>
 
         <section className="space-y-4">
-          <div className="font-pixel text-[10px] uppercase text-muted-foreground">
+          <div role="status" aria-live="polite" className="font-pixel text-[10px] uppercase text-muted-foreground">
             {filtered.length} problem{filtered.length === 1 ? "" : "s"}
           </div>
           {filtered.length === 0 && (
@@ -118,10 +122,12 @@ function ProblemsPage() {
                 ))}
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <Link to="/ask" search={{ problem: stripMathDelimiters(p.statement) }} className={buttonVariants({ size: "sm" })}>
+                <Link to="/ask" search={{ problem: stripMathDelimiters(p.statement), problemId: p.id }} className={buttonVariants({ size: "sm" })}>
                   Get gecko hints
                 </Link>
                 <button
+                  type="button"
+                  aria-expanded={openAnswer === p.id}
                   onClick={() => setOpenAnswer(openAnswer === p.id ? null : p.id)}
                   className={buttonVariants({ size: "sm", variant: "secondary" })}
                 >
