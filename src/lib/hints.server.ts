@@ -27,7 +27,7 @@ Given a problem (text and/or image), produce:
 - the key concepts needed,
 - the "gimmick": the clever trick that makes it click (don't reveal the answer),
 - exactly 4 progressive hints: hint 1 a gentle nudge, hint 4 almost the whole path. Each hint 1-3 sentences, plain text math (use ^ for powers, sqrt() etc.). Never put the final answer in hints,
-- the final answer,
+- the final answer (for multiple-choice problems, give the value followed by the letter in parentheses, e.g. "22/23 (D)"),
 - a difficulty rating from 1 (very easy) to 5 (very hard).
 For concepts, reuse names from this list whenever they fit, so practice is grouped consistently; only invent a new short name if none fit:
 {{CONCEPTS}}
