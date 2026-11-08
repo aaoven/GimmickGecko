@@ -11,7 +11,9 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "data:prepare": "node --env-file-if-exists=.env scripts/contest-data.mjs",
+    "test:data": "node --test scripts/contest-data.test.mjs"
   },
   "overrides": {
     "rolldown": "1.2.1"

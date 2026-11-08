@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({ hints: vi.fn(), help: vi.fn(), speak: vi.fn() 
 vi.mock("@tanstack/react-start", () => ({ useServerFn: (fn: unknown) => fn }));
 vi.mock("@/lib/hints.functions", () => ({ getHints: mocks.hints }));
 vi.mock("@/lib/attempts.functions", () => ({ saveProblemHelp: mocks.help }));
+vi.mock("@/lib/problems.functions", () => ({ getSourceSolution: vi.fn() }));
 vi.mock("@/lib/stream-speech", () => ({ streamSpeech: mocks.speak }));
 vi.mock("@/components/AccountSession", () => ({ useAccount: () => ({ user: null }) }));
 vi.mock("@/components/AnswerChecker", () => ({

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { ImagePlus, Loader2, Square, Volume2, VolumeX, X } from "lucide-react";
 import { streamSpeech } from "@/lib/stream-speech";
@@ -6,6 +7,7 @@ import { toast } from "sonner";
 import geckoImg from "@/assets/gecko.png";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { AnswerChecker } from "@/components/AnswerChecker";
+import { SourceSolution } from "@/components/SourceSolution";
 import { useAccount } from "@/components/AccountSession";
 import { saveProblemHelp } from "@/lib/attempts.functions";
 import { getHints } from "@/lib/hints.functions";
@@ -24,10 +26,16 @@ export function HintCoach({
   const fetchHints = useServerFn(getHints);
   const [problem, setProblem] = useState(initialProblem);
   const [image, setImage] = useState<string | undefined>();
-  const bankProblemId = problem === initialProblem && !image ? problemId : undefined;
+  const [matched, setMatched] = useState<{ id: string; label: string } | null>(null);
+  const bankProblemId =
+    matched?.id ?? (problem === initialProblem && !image ? problemId : undefined);
   const [loading, setLoading] = useState(false);
   const [readingImage, setReadingImage] = useState(false);
   const [result, setResult] = useState<HintResult | null>(null);
+  const [canCheckAnswer, setCanCheckAnswer] = useState(true);
+  const [grounding, setGrounding] = useState<"source_solution" | "bank_answer" | "generated">(
+    "generated",
+  );
   const [revealed, setRevealed] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [showGimmick, setShowGimmick] = useState(false);
@@ -92,6 +100,7 @@ export function HintCoach({
     setRevealed(0);
     setShowAnswer(false);
     setShowGimmick(false);
+    setMatched(null);
   }
 
   function onFile(file?: File) {
@@ -135,7 +144,12 @@ export function HintCoach({
         },
       });
       if (!res.ok) toast.error(res.error);
-      else setResult(res.result);
+      else {
+        setResult(res.result);
+        setMatched(res.match ?? null);
+        setCanCheckAnswer(res.canCheckAnswer ?? true);
+        setGrounding(res.grounding ?? "generated");
+      }
     } catch {
       toast.error("Something went wrong. Try again.");
     } finally {
@@ -156,6 +170,15 @@ export function HintCoach({
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
       <section className="space-y-6">
+        {matched && (
+          <p role="status" className="bg-card p-4 pixel-box">
+            Found in the bank:{" "}
+            <Link to="/ask" search={{ problemId: matched.id }} className="text-primary underline">
+              {matched.label}
+            </Link>
+            . Hints use the saved problem and answer key.
+          </p>
+        )}
         <div className="bg-card p-5 pixel-box-lg">
           <label
             htmlFor="problem"
@@ -217,6 +240,13 @@ export function HintCoach({
 
         {result && (
           <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              {grounding === "source_solution"
+                ? "Hints follow a saved source solution."
+                : grounding === "bank_answer"
+                  ? "Answer checked against the saved key; hint reasoning is AI-generated."
+                  : "AI-generated coaching. Check important steps against your source."}
+            </p>
             <div className="flex flex-wrap gap-2">
               {result.concepts.map((c) => (
                 <span
@@ -266,12 +296,21 @@ export function HintCoach({
                 Answer: {result.answer}
               </div>
             )}
-            {!showAnswer && (
+            {!showAnswer && canCheckAnswer && (
               <AnswerChecker
                 key={bankProblemId ?? problem}
                 answer={result.answer}
                 problemId={bankProblemId}
               />
+            )}
+            {showAnswer && bankProblemId && (
+              <SourceSolution key={bankProblemId} problemId={bankProblemId} />
+            )}
+            {!canCheckAnswer && (
+              <p className="text-sm text-muted-foreground">
+                No automatic answer key is available. Compare your reasoning with the source
+                solution.
+              </p>
             )}
           </div>
         )}
