@@ -38,3 +38,4 @@ use the editor.
 - Shared button interaction feedback and control transitions live in the global stylesheet, with reduced-motion overrides, so effects remain consistent across pages.
 - Bank practice uses an inline per-question control and user-keyed server progress queries; saved help and successful attempts determine available stars, and previously solved answers return no additional award.
 - Skill and recommendation reads merge persisted answer reveals as zero-score practice only for bank questions absent from attempts; this counts possible stars once without fabricated answer attempts or overwriting earned stars.
+- Keep the full star-scoring explanation on the dedicated `/stars` route, linked from home, so scoring guidance has its own shareable page.
