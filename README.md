@@ -3,15 +3,13 @@
 
 We are the minds behind Gimmick-Gecko, a website dedicated to making math contest prep intuitive and fun!
 
+## What makes Gimmick Gecko special? ⭐
+Tired of failing math competitions? Running out of time? Sick of all the gimmicks? Look no further! 
+Nowadays math contests revolve less around pure logic and problem-solving abilities than pattern-recognition and gimmicky short-cuts. 
+
 This project was built with [Lovable](https://lovable.dev).
 
-## Build with Lovable
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/bd9a03c1-19c9-4d30-86fb-2ec7889e7df8).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
 
 ## Development
 
