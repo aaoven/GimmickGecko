@@ -2,14 +2,16 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { BarChart3, LogOut, Save, UserRound } from "lucide-react";
+import { BarChart3, LogOut, Save, Target, UserRound } from "lucide-react";
 import { getProfile, saveProfile } from "@/lib/account.functions";
-import { getMyAttempts } from "@/lib/attempts.functions";
+import { getMyAttempts, getRecommendations } from "@/lib/attempts.functions";
 import { accuracy, computeSkillBreakdown } from "@/lib/skills";
 import { profileSchema } from "@/lib/account-schema";
 import { useAccount } from "@/components/AccountSession";
 import { AccountField } from "@/components/AccountFields";
-import { Button } from "@/components/ui/button";
+import { AnswerChecker } from "@/components/AnswerChecker";
+import { DifficultyStars } from "@/components/DifficultyStars";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,11 +24,13 @@ function AccountPage() {
   const fetchProfile = useServerFn(getProfile);
   const updateProfile = useServerFn(saveProfile);
   const fetchAttempts = useServerFn(getMyAttempts);
+  const fetchRecommendations = useServerFn(getRecommendations);
   const { user } = useAccount();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const query = useQuery({ queryKey: ["profile", user?.id], queryFn: () => fetchProfile() });
   const attemptsQuery = useQuery({ queryKey: ["attempts", user?.id], queryFn: () => fetchAttempts() });
+  const recsQuery = useQuery({ queryKey: ["recommendations", user?.id], queryFn: () => fetchRecommendations() });
   const stats = useMemo(() => computeSkillBreakdown(attemptsQuery.data ?? []), [attemptsQuery.data]);
   const maxTotal = Math.max(1, ...stats.map((s) => s.total));
   const [username, setUsername] = useState("");
@@ -82,6 +86,49 @@ function AccountPage() {
           <div className="mt-3 flex gap-4 text-xs text-muted-foreground">
             <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 bg-primary" /> Correct</span>
             <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 bg-destructive" /> Missed</span>
+          </div>
+        </>
+      )}
+    </section>
+    <section className="mt-10 border-t-4 border-border pt-6">
+      <div className="mb-1 flex items-center gap-3"><Target className="h-6 w-6 text-accent" /><h2 className="font-pixel text-sm text-primary">Recommended for you</h2></div>
+      {recsQuery.isPending ? (
+        <p role="status">Loading recommendations…</p>
+      ) : recsQuery.isError ? (
+        <p role="alert" className="text-destructive">Recommendations couldn't be loaded.</p>
+      ) : recsQuery.data.problems.length === 0 ? (
+        (attemptsQuery.data?.length ?? 0) === 0 ? (
+          <p className="text-muted-foreground">Answer some problems in the <Link to="/problems" className="text-accent underline">problem bank</Link> and the gecko will suggest what to practice next.</p>
+        ) : (
+          <p className="text-muted-foreground">You've solved every problem in the bank — nice work!</p>
+        )
+      ) : (
+        <>
+          <p className="mb-5 text-sm text-muted-foreground">
+            Picked from the problem bank to train your weakest concepts: {recsQuery.data.weakest.map((s) => s.concept).join(", ")}.
+          </p>
+          <div className="space-y-4">
+            {recsQuery.data.problems.map((p) => {
+              const weak = new Set(recsQuery.data.weakest.map((s) => s.concept));
+              return (
+                <article key={p.id} className="bg-card p-5 pixel-box">
+                  <div className="mb-3 flex flex-wrap items-center gap-3">
+                    <span className="bg-primary px-2 py-1 font-pixel text-[10px] text-primary-foreground">
+                      {p.contest} {p.year}{p.problem_number ? ` #${p.problem_number}` : ""}
+                    </span>
+                    <DifficultyStars value={p.difficulty} />
+                  </div>
+                  <p className="mb-4 leading-relaxed">{p.statement}</p>
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    {p.concepts.map((c) => (
+                      <span key={c} className={`px-2 py-0.5 text-xs ${weak.has(c) ? "bg-accent text-accent-foreground" : "bg-secondary text-muted-foreground"}`}>{c}</span>
+                    ))}
+                  </div>
+                  <Link to="/" search={{ problem: p.statement }} className={buttonVariants({ size: "sm" })}>Get gecko hints</Link>
+                  <AnswerChecker answer={p.answer} problemId={p.id} />
+                </article>
+              );
+            })}
           </div>
         </>
       )}

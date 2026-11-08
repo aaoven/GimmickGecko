@@ -9,6 +9,7 @@
 
 # Skillset dashboard
 - [x] Record signed-in users' answer checks on bank problems and show an AREDL-style per-concept breakdown (correct/missed bars + accuracy) on the account page; verified end-to-end signed in.
+- [x] Recommend bank problems at the bottom of the account page based on weakest concepts; excludes solved problems and refreshes live after answer checks; verified signed in (wrong answer keeps card, correct answer removes it and updates the graph).
 
 # Problem bank difficulty
 - [x] Show 1–5 star difficulty on every problem; all 12 bank problems rated, 1–5 range enforced in the database, star display verified in the preview.

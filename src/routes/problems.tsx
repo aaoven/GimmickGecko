@@ -2,8 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { listProblems } from "@/lib/problems.functions";
-import { difficultyStars } from "@/lib/difficulty";
 import { AnswerChecker } from "@/components/AnswerChecker";
+import { DifficultyStars } from "@/components/DifficultyStars";
 import { buttonVariants } from "@/components/ui/button";
 
 const problemsQuery = queryOptions({ queryKey: ["problems"], queryFn: () => listProblems() });
@@ -22,16 +22,6 @@ export const Route = createFileRoute("/problems")({
   loader: ({ context }) => context.queryClient.ensureQueryData(problemsQuery),
   component: ProblemsPage,
 });
-
-function DifficultyStars({ value }: { value: number }) {
-  const { filled, empty } = difficultyStars(value);
-  return (
-    <span className="text-xl leading-none text-accent" role="img" aria-label={`Difficulty: ${filled} out of 5 stars`}>
-      {"★".repeat(filled)}
-      <span className="text-muted">{"★".repeat(empty)}</span>
-    </span>
-  );
-}
 
 function ProblemsPage() {
   const { data: problems } = useSuspenseQuery(problemsQuery);

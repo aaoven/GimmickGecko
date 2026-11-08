@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
 import { isCorrectAnswer } from "@/lib/answers";
 import { recordAttempt } from "@/lib/attempts.functions";
 import { useAccount } from "@/components/AccountSession";
@@ -10,6 +11,7 @@ export function AnswerChecker({ answer, problemId }: { answer: string | null; pr
   const [value, setValue] = useState("");
   const [result, setResult] = useState<"correct" | "wrong" | null>(null);
   const { user } = useAccount();
+  const queryClient = useQueryClient();
   const record = useServerFn(recordAttempt);
   if (answer == null) return null;
   return (
@@ -20,7 +22,12 @@ export function AnswerChecker({ answer, problemId }: { answer: string | null; pr
         const correct = isCorrectAnswer(value, answer);
         setResult(correct ? "correct" : "wrong");
         if (problemId && user) {
-          void record({ data: { problemId, correct } }).catch((err) => console.error("attempt not saved", err));
+          void record({ data: { problemId, correct } })
+            .then(() => {
+              void queryClient.invalidateQueries({ queryKey: ["attempts"] });
+              void queryClient.invalidateQueries({ queryKey: ["recommendations"] });
+            })
+            .catch((err) => console.error("attempt not saved", err));
         }
       }}
     >
