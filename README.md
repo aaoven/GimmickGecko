@@ -29,13 +29,6 @@ Either type the problem into the designated question box or upload an image of y
 ### Problems Bank ✖️➗
 A bank filled with problems from multiple math contests. Filter by concept, difficulty, contest name, and more! You can check your answer, reveal the answer, or get Gecko Hints if you're stuck!
 
-### Account Page <img width="480" height="320" alt="ExcitedFamilyGuyGIF" src="https://github.com/user-attachments/assets/f53b0d99-3ac3-426d-a18c-60bbb31c70ad" />
+### Account Page 👤
+View and edit your account details and information! Also look at your skillset breakdown and recommended problem! 
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
-```
