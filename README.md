@@ -7,6 +7,7 @@ We are the minds behind Gimmick-Gecko, a website dedicated to making math contes
 Tired of failing math competitions? Running out of time? Sick of all the gimmicks? Look no further! 
 
 Nowadays math contests revolve less around pure logic and problem-solving abilities than pattern-recognition and gimmicky short-cuts. 
+
 Gimmick Gecko takes the best of both worlds-identifying the "gimmicks" and concepts associated with a problem while still explaining the logic and reasoning behind it. Here you will receive personally tailored feedback and analysis, beginner-friendly explanations, and your very own gecko that points out gimmicks!
 
 #### Navigating Gimmick Gecko 🧭:
