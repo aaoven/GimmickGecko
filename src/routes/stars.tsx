@@ -28,7 +28,7 @@ function StarsPage() {
           <h1 id="stars-heading" className="font-pixel text-sm leading-relaxed text-primary sm:text-base">How stars work</h1>
         </div>
         <p className="mb-6 max-w-2xl leading-relaxed text-muted-foreground">
-          A question's difficulty is also its star value. Answer correctly without help to earn all its stars for <strong className="text-foreground">every concept it covers</strong>.
+          Correct answers earn the difficulty rating in stars for <strong className="text-foreground">each concept covered</strong>.
         </p>
         <dl className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {["Very easy", "Easy", "Medium", "Hard", "Very hard"].map((label, index) => (
@@ -42,28 +42,28 @@ function StarsPage() {
           <div>
             <h3 className="mb-2 font-semibold text-foreground">Each hint costs one star</h3>
             <p className="leading-relaxed text-muted-foreground">
-              Hints unfold one at a time. Each new hint lowers your available reward by <strong className="text-accent">1 star</strong>, never below zero. A 3-star problem with one hint earns 2 stars; a 1-star problem with one hint earns 0. The tracker beside the hint buttons shows what's left.
+              Each hint subtracts <strong className="text-accent">1 star</strong>, never below zero. For example: 3 stars − 1 hint = 2 stars.
             </p>
           </div>
           <div>
             <h3 className="mb-2 font-semibold text-foreground">One question, one reward</h3>
             <p className="leading-relaxed text-muted-foreground">
-              A wrong answer earns no stars, but you can try again. Once you've solved a question, repeating it earns no extra stars. Revealing its answer makes the remaining reward <strong className="text-highlight">0 stars</strong>, even if you hide it again. Stars already earned stay yours.
+              Wrong answer? Try again. Solved questions earn no extra stars. Revealing an answer leaves <strong className="text-highlight">0 stars available</strong> permanently; earned stars stay yours.
             </p>
           </div>
           <div>
             <h3 className="mb-2 font-semibold text-foreground">Your skills: earned out of possible</h3>
             <p className="leading-relaxed text-muted-foreground">
-              Each concept shows the stars you've earned out of the full difficulty stars of the questions you've attempted or revealed. Each question counts once per covered concept; hints reduce earned stars, not possible stars.
+              Earned stars / full stars possible from attempted or answer-revealed questions. Each question counts once per concept. Hints lower earned stars only.
             </p>
             <p className="mt-3 leading-relaxed text-muted-foreground">
-              For example, if a concept shows <strong className="text-primary">1 / 2 stars</strong> and you reveal a new 1-star question covering it, the total becomes <strong className="text-accent">1 / 3 stars</strong>. Revealing it again won't change the total.
+              Reveal a new 1-star answer: <strong className="text-primary">1 / 2</strong> becomes <strong className="text-accent">1 / 3</strong>.
             </p>
           </div>
           <div>
             <h3 className="mb-2 font-semibold text-foreground">Your own questions count too</h3>
             <p className="leading-relaxed text-muted-foreground">
-              Sign in to save your progress. The gecko categorizes typed and uploaded questions by concept and assigns a difficulty rating. Your answers contribute to the same skill breakdown as bank practice, helping identify which concepts need more work.
+              Sign in to track bank, typed, and uploaded questions together. The gecko assigns your questions a difficulty and concepts.
             </p>
           </div>
         </div>
