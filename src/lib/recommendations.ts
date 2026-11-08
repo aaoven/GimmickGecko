@@ -1,10 +1,6 @@
-import { accuracy, computeSkillBreakdown, type ConceptStat } from "@/lib/skills";
+import { accuracy, computeSkillBreakdown, type ConceptStat, type SkillAttempt } from "@/lib/skills";
 
-export interface AttemptRecord {
-  problemId: string;
-  correct: boolean;
-  concepts: string[];
-}
+export type AttemptRecord = SkillAttempt;
 
 export interface RecommendableProblem {
   id: string;
@@ -13,15 +9,15 @@ export interface RecommendableProblem {
 }
 
 /**
- * The concepts with the user's lowest accuracy, most attempted first on ties.
+ * The concepts with the user's lowest earned-star percentage, most attempted first on ties.
  * These come from the same per-concept stats as the skillset breakdown.
  */
 export function weakestConcepts(
-  attempts: Array<{ correct: boolean; concepts: string[] }>,
+  attempts: SkillAttempt[],
   count = 3,
 ): ConceptStat[] {
   return computeSkillBreakdown(attempts)
-    .sort((a, b) => accuracy(a) - accuracy(b) || b.total - a.total || a.concept.localeCompare(b.concept))
+    .sort((a, b) => accuracy(a) - accuracy(b) || b.possible - a.possible || a.concept.localeCompare(b.concept))
     .slice(0, count);
 }
 
