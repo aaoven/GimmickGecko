@@ -3,6 +3,7 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { listProblems } from "@/lib/problems.functions";
 import { difficultyStars } from "@/lib/difficulty";
+import { AnswerChecker } from "@/components/AnswerChecker";
 import { buttonVariants } from "@/components/ui/button";
 
 const problemsQuery = queryOptions({ queryKey: ["problems"], queryFn: () => listProblems() });
@@ -135,6 +136,7 @@ function ProblemsPage() {
                   {openAnswer === p.id ? `Answer: ${p.answer}` : "Show answer"}
                 </button>
               </div>
+              <AnswerChecker answer={p.answer} problemId={p.id} />
             </article>
           ))}
         </section>

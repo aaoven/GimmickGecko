@@ -5,6 +5,7 @@ import { streamSpeech } from "@/lib/stream-speech";
 import { toast } from "sonner";
 import geckoImg from "@/assets/gecko.png";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { AnswerChecker } from "@/components/AnswerChecker";
 import { getHints } from "@/lib/hints.functions";
 import type { HintResult } from "@/lib/hints.server";
 
@@ -175,6 +176,7 @@ export function HintCoach({ initialProblem = "" }: { initialProblem?: string }) 
                 Answer: {result.answer}
               </div>
             )}
+            {!showAnswer && revealed < result.hints.length && <AnswerChecker answer={result.answer} />}
           </div>
         )}
       </section>

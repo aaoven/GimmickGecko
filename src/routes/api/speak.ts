@@ -9,10 +9,10 @@ export const Route = createFileRoute("/api/speak")({
       POST: async ({ request }) => {
         const apiKey = process.env["ELEVENLABS_API_KEY"];
         if (!apiKey) return new Response("Voice is not connected", { status: 500 });
-        const body = (await request.json().catch(() => null)) as { text?: unknown } | null;
-        const text = typeof body?.text === "string" ? body.text.trim().slice(0, 1500) : "";
-        if (!text) return new Response("Missing text", { status: 400 });
         try {
+          const body = (await request.json().catch(() => null)) as { text?: unknown } | null;
+          const text = typeof body?.text === "string" ? body.text.trim().slice(0, 1500) : "";
+          if (!text) return new Response("Missing text", { status: 400 });
           const upstream = await fetch(
             `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}/stream?output_format=mp3_44100_128`,
             {
@@ -31,11 +31,16 @@ export const Route = createFileRoute("/api/speak")({
             console.error(`ElevenLabs failed [${upstream.status}]: ${err}`);
             return new Response(err, { status: upstream.status });
           }
-          return new Response(upstream.body, {
+          // Buffer before responding so a client disconnect can't reject mid-stream.
+          const audio = await upstream.arrayBuffer();
+          return new Response(audio, {
             headers: { "Content-Type": "audio/mpeg", "Cache-Control": "no-cache" },
           });
         } catch (e) {
-          if (request.signal.aborted) return new Response(null, { status: 499 });
+          // Expected when the listener stops or navigates away mid-request.
+          if (request.signal.aborted || (e instanceof Error && e.name === "AbortError")) {
+            return new Response(null, { status: 499 });
+          }
           throw e;
         }
       },
