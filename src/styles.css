@@ -116,6 +116,22 @@
 @utility pixelated {
   image-rendering: pixelated;
 }
+@utility pixel-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--secondary);
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+  &::-webkit-scrollbar-track {
+    background: var(--secondary);
+    border-left: 2px solid var(--border);
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border: 2px solid var(--border);
+    border-radius: 0;
+  }
+}
 
 @keyframes gecko-bob {
   0%, 100% { transform: translateY(0); }
