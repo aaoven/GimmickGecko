@@ -176,7 +176,7 @@ export function HintCoach({ initialProblem = "" }: { initialProblem?: string }) 
                 Answer: {result.answer}
               </div>
             )}
-            <AnswerChecker answer={result.answer} />
+            {!showAnswer && revealed < result.hints.length && <AnswerChecker answer={result.answer} />}
           </div>
         )}
       </section>
