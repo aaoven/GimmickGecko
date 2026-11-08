@@ -28,7 +28,7 @@ Either type the problem into the designated question box or upload an image of y
 A bank filled with problems from multiple math contests. Filter by concept, difficulty, contest name, and more! You can check your answer, reveal the answer, or get Gecko Hints if you're stuck!
 
 ### Account Page 👤
-View and edit your account details and information! Also look at your skillset breakdown and recommended problem! 
+View and edit your account details and information! You can also view a breakdown of your skillsets and a recommended problem! 
 
 
 # This project was built with [Lovable](https://lovable.dev). 💞
