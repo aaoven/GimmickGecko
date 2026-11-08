@@ -76,6 +76,6 @@ function AuthPage() {
       {(error || fieldErrors["form"]) && <p role="alert" className="text-destructive">{error || fieldErrors["form"]}</p>}{notice && <p role="status" className="border-l-4 border-primary bg-panel p-4 text-foreground">{notice}</p>}
       <Button type="submit" disabled={busy} className="w-full">{mode === "forgot" ? <Mail /> : mode === "signup" ? <UserPlus /> : <LogIn />}{busy ? "Please wait…" : mode === "signup" ? "Create account" : mode === "forgot" ? "Send reset link" : "Log in"}</Button>
     </form>
-    <div className="mt-5 flex flex-wrap items-center justify-between gap-3"><Button variant="link" size="sm" onClick={() => changeMode(mode === "forgot" ? "login" : "forgot")}>{mode === "forgot" ? "Back to login" : "Forgot password?"}</Button><Link to="/" className="text-sm text-muted-foreground underline">Back to hints</Link></div>
+    <div className="mt-5 flex flex-wrap items-center justify-between gap-3"><Button variant="link" size="sm" onClick={() => changeMode(mode === "forgot" ? "login" : "forgot")}>{mode === "forgot" ? "Back to login" : "Forgot password?"}</Button><Link to="/ask" className="text-sm text-muted-foreground underline">Ask the gecko</Link></div>
   </main>;
 }
