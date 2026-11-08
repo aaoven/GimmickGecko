@@ -1,20 +1,20 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { z } from "zod";
-import { HintCoach } from "@/components/HintCoach";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight, BarChart3, BookOpen, Lightbulb, Volume2 } from "lucide-react";
+import geckoImg from "@/assets/gecko.png";
 
 export const Route = createFileRoute("/")({
   validateSearch: z.object({ problem: z.string().optional(), problemId: z.string().uuid().optional() }),
   head: () => ({
     meta: [
-      { title: "Gimmick Gecko — Contest Math Hints" },
-      { name: "description", content: "Upload a math contest problem and get progressive hints, key concepts and the gimmick from a pixel gecko." },
-      { property: "og:title", content: "Gimmick Gecko — Contest Math Hints" },
-      { property: "og:description", content: "Progressive hints, key concepts and gimmicks for AMC and AIME problems." },
+      { title: "Gimmick Gecko — Contest Math Practice" },
+      { name: "description", content: "Practice math contest problems with a pixel gecko coach: progressive hints, a filterable problem bank, and a skill dashboard that tracks every concept." },
+      { property: "og:title", content: "Gimmick Gecko — Contest Math Practice" },
+      { property: "og:description", content: "Progressive gecko hints, a concept-filtered problem bank, and a dashboard that finds your weakest concepts." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: Index,
+  component: HomePage,
 });
 
 function Index() {

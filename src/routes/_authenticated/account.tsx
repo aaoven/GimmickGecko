@@ -11,6 +11,8 @@ import { useAccount } from "@/components/AccountSession";
 import { AccountField } from "@/components/AccountFields";
 import { AnswerChecker } from "@/components/AnswerChecker";
 import { DifficultyStars } from "@/components/DifficultyStars";
+import { MathText } from "@/components/MathText";
+import { stripMathDelimiters } from "@/lib/math-text";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -118,7 +120,7 @@ function AccountPage() {
                     </span>
                     <DifficultyStars value={p.difficulty} />
                   </div>
-                  <p className="mb-4 leading-relaxed">{p.statement}</p>
+                  <p className="mb-4 leading-relaxed"><MathText text={p.statement} /></p>
                   <div className="mb-4 flex flex-wrap gap-2">
                     {p.concepts.map((c) => (
                       <span key={c} className={`px-2 py-0.5 text-xs ${weak.has(c) ? "bg-accent text-accent-foreground" : "bg-secondary text-muted-foreground"}`}>{c}</span>
