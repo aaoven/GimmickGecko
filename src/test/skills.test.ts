@@ -45,3 +45,30 @@ describe("accuracy", () => {
     expect(accuracy({ earned: 0, possible: 0 })).toBe(0);
   });
 });
+
+import { computeStarBreakdown, starsForAnswer } from "@/lib/skills";
+
+describe("star scoring", () => {
+  it("awards the problem's rating for a correct answer with no hints", () => {
+    expect(starsForAnswer(3, 0, true)).toBe(3);
+  });
+  it("subtracts one star per hint", () => {
+    expect(starsForAnswer(3, 2, true)).toBe(1);
+  });
+  it("never goes below zero", () => {
+    expect(starsForAnswer(2, 5, true)).toBe(0);
+  });
+  it("awards nothing for a wrong answer", () => {
+    expect(starsForAnswer(4, 0, false)).toBe(0);
+  });
+  it("credits every concept and counts each problem's best score once", () => {
+    const stats = computeStarBreakdown([
+      { problemId: "a", concepts: ["Algebra", "Exponents"], earnedStars: 0, possibleStars: 3 },
+      { problemId: "a", concepts: ["Algebra", "Exponents"], earnedStars: 2, possibleStars: 3 },
+      { problemId: "a", concepts: ["Algebra", "Exponents"], earnedStars: 2, possibleStars: 3 },
+      { problemId: "b", concepts: ["Algebra"], earnedStars: 1, possibleStars: 1 },
+    ]);
+    expect(stats.find((s) => s.concept === "Algebra")).toEqual({ concept: "Algebra", earned: 3, possible: 4, problems: 2 });
+    expect(stats.find((s) => s.concept === "Exponents")).toEqual({ concept: "Exponents", earned: 2, possible: 3, problems: 1 });
+  });
+});

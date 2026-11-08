@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { BarChart3, LogOut, Save, Target, UserRound } from "lucide-react";
 import { getProfile, saveProfile } from "@/lib/account.functions";
 import { getMyAttempts, getRecommendations } from "@/lib/attempts.functions";
-import { accuracy, computeSkillBreakdown } from "@/lib/skills";
+import { computeStarBreakdown } from "@/lib/skills";
 import { profileSchema } from "@/lib/account-schema";
 import { useAccount } from "@/components/AccountSession";
 import { AccountField } from "@/components/AccountFields";
