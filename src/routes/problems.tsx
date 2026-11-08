@@ -2,8 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { listProblems } from "@/lib/problems.functions";
+import { stripMathDelimiters } from "@/lib/math-text";
 import { AnswerChecker } from "@/components/AnswerChecker";
 import { DifficultyStars } from "@/components/DifficultyStars";
+import { MathText } from "@/components/MathText";
 import { buttonVariants } from "@/components/ui/button";
 
 const problemsQuery = queryOptions({ queryKey: ["problems"], queryFn: () => listProblems() });
@@ -104,7 +106,7 @@ function ProblemsPage() {
                 </span>
                 <DifficultyStars value={p.difficulty} />
               </div>
-              <p className="mb-4 text-lg leading-relaxed">{p.statement}</p>
+              <p className="mb-4 text-lg leading-relaxed"><MathText text={p.statement} /></p>
               <div className="mb-4 flex flex-wrap gap-2">
                 {p.concepts.map((c) => (
                   <span
@@ -116,7 +118,7 @@ function ProblemsPage() {
                 ))}
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <Link to="/" search={{ problem: p.statement }} className={buttonVariants({ size: "sm" })}>
+                <Link to="/" search={{ problem: stripMathDelimiters(p.statement) }} className={buttonVariants({ size: "sm" })}>
                   Get gecko hints
                 </Link>
                 <button
