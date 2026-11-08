@@ -1,18 +1,27 @@
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { isCorrectAnswer } from "@/lib/answers";
+import { recordAttempt } from "@/lib/attempts.functions";
+import { useAccount } from "@/components/AccountSession";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export function AnswerChecker({ answer }: { answer: string | null }) {
+export function AnswerChecker({ answer, problemId }: { answer: string | null; problemId?: string | undefined }) {
   const [value, setValue] = useState("");
   const [result, setResult] = useState<"correct" | "wrong" | null>(null);
+  const { user } = useAccount();
+  const record = useServerFn(recordAttempt);
   if (answer == null) return null;
   return (
     <form
       className="mt-4 flex flex-wrap items-center gap-3 border-t border-border pt-4"
       onSubmit={(e) => {
         e.preventDefault();
-        setResult(isCorrectAnswer(value, answer) ? "correct" : "wrong");
+        const correct = isCorrectAnswer(value, answer);
+        setResult(correct ? "correct" : "wrong");
+        if (problemId && user) {
+          void record({ data: { problemId, correct } }).catch((err) => console.error("attempt not saved", err));
+        }
       }}
     >
       <Input

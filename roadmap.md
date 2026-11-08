@@ -7,6 +7,9 @@
 # Gecko voice
 - [x] Fix speech endpoint crash when playback is stopped mid-request (abort now returns quietly instead of erroring); verified no overlay in the preview.
 
+# Skillset dashboard
+- [x] Record signed-in users' answer checks on bank problems and show an AREDL-style per-concept breakdown (correct/missed bars + accuracy) on the account page; verified end-to-end signed in.
+
 # Problem bank difficulty
 - [x] Show 1–5 star difficulty on every problem; all 12 bank problems rated, 1–5 range enforced in the database, star display verified in the preview.
 - [x] Let users submit an answer on each problem card and see correct/try-again feedback; verified in the preview.

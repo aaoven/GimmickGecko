@@ -1,9 +1,11 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState, type FormEvent } from "react";
-import { LogOut, Save, UserRound } from "lucide-react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { BarChart3, LogOut, Save, UserRound } from "lucide-react";
 import { getProfile, saveProfile } from "@/lib/account.functions";
+import { getMyAttempts } from "@/lib/attempts.functions";
+import { accuracy, computeSkillBreakdown } from "@/lib/skills";
 import { profileSchema } from "@/lib/account-schema";
 import { useAccount } from "@/components/AccountSession";
 import { AccountField } from "@/components/AccountFields";
@@ -19,10 +21,14 @@ export const Route = createFileRoute("/_authenticated/account")({
 function AccountPage() {
   const fetchProfile = useServerFn(getProfile);
   const updateProfile = useServerFn(saveProfile);
+  const fetchAttempts = useServerFn(getMyAttempts);
   const { user } = useAccount();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const query = useQuery({ queryKey: ["profile", user?.id], queryFn: () => fetchProfile() });
+  const attemptsQuery = useQuery({ queryKey: ["attempts", user?.id], queryFn: () => fetchAttempts() });
+  const stats = useMemo(() => computeSkillBreakdown(attemptsQuery.data ?? []), [attemptsQuery.data]);
+  const maxTotal = Math.max(1, ...stats.map((s) => s.total));
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
@@ -45,9 +51,41 @@ function AccountPage() {
     if (signOutError) { setError("Could not sign out. Please try again."); setBusy(false); return; }
     await navigate({ to: "/auth", replace: true });
   }
-  return <main className="mx-auto max-w-lg px-4 py-10"><div className="mb-7 flex items-center gap-3"><UserRound className="h-7 w-7 text-accent" /><h1 className="font-pixel text-lg text-primary">Your account</h1></div><p className="mb-8 break-all text-muted-foreground">{user?.email}</p>
+  return <main className="mx-auto max-w-2xl px-4 py-10"><div className="mb-7 flex items-center gap-3"><UserRound className="h-7 w-7 text-accent" /><h1 className="font-pixel text-lg text-primary">Your account</h1></div><p className="mb-8 break-all text-muted-foreground">{user?.email}</p>
     {query.isPending ? <p role="status">Loading your profile…</p> : query.isError ? <><p role="alert">Your profile couldn’t be loaded.</p><Button onClick={() => void query.refetch()}>Try again</Button></> : <form onSubmit={submit} className="space-y-5"><AccountField id="profile-username" label="Username" value={username} onChange={e => { setUsername(e.target.value); setSaved(false); }} maxLength={24} required /><AccountField id="profile-name" label="Display name" value={displayName} onChange={e => { setDisplayName(e.target.value); setSaved(false); }} maxLength={80} /><div className="space-y-2"><Label htmlFor="bio">About you</Label><Textarea id="bio" value={bio} onChange={e => { setBio(e.target.value); setSaved(false); }} maxLength={500} rows={4} className="bg-input" /></div><Button type="submit" disabled={busy}><Save />{busy ? "Please wait…" : "Save profile"}</Button></form>}
     {error && <p role="alert" className="mt-4 text-destructive">{error}</p>}{saved && <p role="status" className="mt-4 text-primary">Profile saved.</p>}
+    <section className="mt-10 border-t-4 border-border pt-6">
+      <div className="mb-1 flex items-center gap-3"><BarChart3 className="h-6 w-6 text-accent" /><h2 className="font-pixel text-sm text-primary">Skillset breakdown</h2></div>
+      <p className="mb-5 text-sm text-muted-foreground">How you're doing on each concept, from the bank answers you've checked.</p>
+      {attemptsQuery.isPending ? (
+        <p role="status">Loading your skillset…</p>
+      ) : attemptsQuery.isError ? (
+        <p role="alert" className="text-destructive">Your skillset couldn't be loaded.</p>
+      ) : stats.length === 0 ? (
+        <p className="text-muted-foreground">No attempts yet. <Link to="/problems" className="text-accent underline">Answer some problems</Link> and your graph will grow here.</p>
+      ) : (
+        <>
+          <ul className="space-y-4">
+            {stats.map((s) => (
+              <li key={s.concept}>
+                <div className="mb-1 flex items-baseline justify-between gap-3">
+                  <span className="font-pixel text-[9px] uppercase">{s.concept}</span>
+                  <span className="text-sm text-muted-foreground">{s.correct}/{s.total} correct · {accuracy(s)}%</span>
+                </div>
+                <div className="flex h-4 w-full bg-secondary" role="img" aria-label={`${s.concept}: ${s.correct} of ${s.total} correct`}>
+                  <div className="h-full bg-primary" style={{ width: `${(s.correct / maxTotal) * 100}%` }} />
+                  <div className="h-full bg-destructive" style={{ width: `${((s.total - s.correct) / maxTotal) * 100}%` }} />
+                </div>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-3 flex gap-4 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 bg-primary" /> Correct</span>
+            <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 bg-destructive" /> Missed</span>
+          </div>
+        </>
+      )}
+    </section>
     <div className="mt-10 border-t-4 border-border pt-6"><Button variant="outline" disabled={busy} onClick={signOut}><LogOut />Sign out</Button></div>
   </main>;
 }

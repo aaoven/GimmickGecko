@@ -136,7 +136,7 @@ function ProblemsPage() {
                   {openAnswer === p.id ? `Answer: ${p.answer}` : "Show answer"}
                 </button>
               </div>
-              <AnswerChecker answer={p.answer} />
+              <AnswerChecker answer={p.answer} problemId={p.id} />
             </article>
           ))}
         </section>
