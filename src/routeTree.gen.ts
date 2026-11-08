@@ -15,6 +15,7 @@ import { Route as AskRouteImport } from './routes/ask'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ProblemsRouteImport } from './routes/problems'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as StarsRouteImport } from './routes/stars'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as ApiSpeakRouteImport } from './routes/api/speak'
 
@@ -47,6 +48,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StarsRoute = StarsRouteImport.update({
+  id: '/stars',
+  path: '/stars',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
   id: '/account',
   path: '/account',
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/problems': typeof ProblemsRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/stars': typeof StarsRoute
   '/account': typeof AuthenticatedAccountRoute
   '/api/speak': typeof ApiSpeakRoute
 }
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/problems': typeof ProblemsRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/stars': typeof StarsRoute
   '/account': typeof AuthenticatedAccountRoute
   '/api/speak': typeof ApiSpeakRoute
 }
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/problems': typeof ProblemsRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/stars': typeof StarsRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/api/speak': typeof ApiSpeakRoute
 }
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/problems'
     | '/reset-password'
+    | '/stars'
     | '/account'
     | '/api/speak'
   fileRoutesByTo: FileRoutesByTo
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/problems'
     | '/reset-password'
+    | '/stars'
     | '/account'
     | '/api/speak'
   id:
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/problems'
     | '/reset-password'
+    | '/stars'
     | '/_authenticated/account'
     | '/api/speak'
   fileRoutesById: FileRoutesById
@@ -125,6 +137,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ProblemsRoute: typeof ProblemsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  StarsRoute: typeof StarsRoute
   ApiSpeakRoute: typeof ApiSpeakRoute
 }
 
@@ -172,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/stars': {
+      id: '/stars'
+      path: '/stars'
+      fullPath: '/stars'
+      preLoaderRoute: typeof StarsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/account': {
       id: '/_authenticated/account'
       path: '/account'
@@ -207,6 +227,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ProblemsRoute: ProblemsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  StarsRoute: StarsRoute,
   ApiSpeakRoute: ApiSpeakRoute,
 }
 export const routeTree = rootRouteImport
