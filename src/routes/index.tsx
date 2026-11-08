@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, BarChart3, BookOpen, Lightbulb, Star, Volume2 } from "lucide-react";
+import { ArrowRight, BarChart3, BookOpen, Lightbulb, Volume2 } from "lucide-react";
 import geckoImg from "@/assets/gecko.png";
 import { Button } from "@/components/ui/button";
 
@@ -97,12 +97,6 @@ function HomePage() {
           ))}
         </div>
       </section>
-
-      <div className="mb-16">
-        <Button asChild variant="outline" className="h-auto gap-3 whitespace-normal py-4">
-          <Link to="/stars"><Star aria-hidden="true" className="text-accent" /> How stars work <ArrowRight aria-hidden="true" /></Link>
-        </Button>
-      </div>
 
       <section className="bg-panel p-8 text-center pixel-box-lg">
         <h2 className="mb-3 font-pixel text-sm text-primary sm:text-base">Ready for your first gimmick?</h2>

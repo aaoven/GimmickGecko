@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { BarChart3, LogOut, Save, Star, Target, UserRound } from "lucide-react";
+import { ArrowRight, BarChart3, LogOut, Save, Star, Target, UserRound } from "lucide-react";
 import { getProfile, saveProfile } from "@/lib/account.functions";
 import { getMyAttempts, getRecommendations } from "@/lib/attempts.functions";
 import { computeStarBreakdown } from "@/lib/skills";
@@ -63,7 +63,7 @@ function AccountPage() {
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3"><BarChart3 aria-hidden="true" className="h-6 w-6 shrink-0 text-accent" /><h2 className="font-pixel text-sm leading-relaxed text-primary">Skillset breakdown</h2></div>
         <Button asChild variant="outline" size="sm" className="h-auto min-h-9 whitespace-normal py-2">
-          <Link to="/stars"><Star aria-hidden="true" className="text-accent" /> How stars work</Link>
+          <Link to="/stars"><Star aria-hidden="true" className="text-accent" /> How stars work <ArrowRight aria-hidden="true" /></Link>
         </Button>
       </div>
       <p className="mb-5 text-sm text-muted-foreground">Stars earned from each question’s best score.</p>
