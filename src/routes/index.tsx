@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, BarChart3, BookOpen, Lightbulb, Volume2 } from "lucide-react";
+import { ArrowRight, BarChart3, BookOpen, Lightbulb, Star, Volume2 } from "lucide-react";
 import geckoImg from "@/assets/gecko.png";
 import { Button } from "@/components/ui/button";
 
@@ -42,7 +42,7 @@ const features = [
     title: "A real problem bank",
     body: (
       <>
-        Past <strong className="font-semibold text-foreground">AIME problems</strong> you can filter by the concepts they require, each rated{" "}
+        Past <strong className="font-semibold text-foreground">contest problems</strong> you can filter by contest, difficulty, and the concepts they require, each rated{" "}
         <strong className="font-semibold text-accent">one to five stars</strong>. Check your answer right on the card.
       </>
     ),
@@ -52,7 +52,7 @@ const features = [
     title: "A dashboard that knows you",
     body: (
       <>
-        A free account turns every checked answer into a <strong className="font-semibold text-foreground">per-concept skill graph</strong> and recommends bank problems that target your{" "}
+        Sign in to track <strong className="font-semibold text-foreground">earned and possible stars for each concept</strong> from bank problems and your own typed or uploaded questions, with recommendations that target your{" "}
         <strong className="font-semibold text-accent">weakest concepts</strong>.
       </>
     ),
@@ -95,6 +95,53 @@ function HomePage() {
               <p className="leading-relaxed text-muted-foreground">{f.body}</p>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="stars-heading" className="mb-16 border-y border-border py-10">
+        <div className="mb-6 flex items-center gap-3">
+          <Star aria-hidden="true" className="h-7 w-7 shrink-0 fill-current text-accent" />
+          <h2 id="stars-heading" className="font-pixel text-sm leading-relaxed text-primary sm:text-base">How stars work</h2>
+        </div>
+        <p className="mb-6 max-w-2xl leading-relaxed text-muted-foreground">
+          A question's difficulty is also its star value. Answer correctly without help to earn all its stars for <strong className="text-foreground">every concept it covers</strong>.
+        </p>
+        <dl className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          {["Very easy", "Easy", "Medium", "Hard", "Very hard"].map((label, index) => (
+            <div key={label} className="border-l-2 border-accent pl-4">
+              <dt className="mb-1 text-sm text-muted-foreground">{label}</dt>
+              <dd className="font-semibold text-accent">{index + 1} {index === 0 ? "star" : "stars"}</dd>
+            </div>
+          ))}
+        </dl>
+        <div className="grid gap-x-10 gap-y-6 sm:grid-cols-2">
+          <div>
+            <h3 className="mb-2 font-semibold text-foreground">Each hint costs one star</h3>
+            <p className="leading-relaxed text-muted-foreground">
+              Hints unfold one at a time. Each new hint lowers your available reward by <strong className="text-accent">1 star</strong>, never below zero. A 3-star problem with one hint earns 2 stars; a 1-star problem with one hint earns 0. The tracker beside the hint buttons shows what's left.
+            </p>
+          </div>
+          <div>
+            <h3 className="mb-2 font-semibold text-foreground">One question, one reward</h3>
+            <p className="leading-relaxed text-muted-foreground">
+              A wrong answer earns no stars, but you can try again. Once you've solved a question, repeating it earns no extra stars. Revealing its answer makes the remaining reward <strong className="text-highlight">0 stars</strong>, even if you hide it again. Stars already earned stay yours.
+            </p>
+          </div>
+          <div>
+            <h3 className="mb-2 font-semibold text-foreground">Your skills: earned out of possible</h3>
+            <p className="leading-relaxed text-muted-foreground">
+              Each concept shows the stars you've earned out of the full difficulty stars of the questions you've attempted or revealed. Each question counts once per covered concept; hints reduce earned stars, not possible stars.
+            </p>
+            <p className="mt-3 leading-relaxed text-muted-foreground">
+              For example, if a concept shows <strong className="text-primary">1 / 2 stars</strong> and you reveal a new 1-star question covering it, the total becomes <strong className="text-accent">1 / 3 stars</strong>. Revealing it again won't change the total.
+            </p>
+          </div>
+          <div>
+            <h3 className="mb-2 font-semibold text-foreground">Your own questions count too</h3>
+            <p className="leading-relaxed text-muted-foreground">
+              Sign in to save your progress. The gecko categorizes typed and uploaded questions by concept and assigns a difficulty rating. Your answers contribute to the same skill breakdown as bank practice, helping identify which concepts need more work.
+            </p>
+          </div>
         </div>
       </section>
 
