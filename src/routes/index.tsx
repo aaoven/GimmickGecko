@@ -6,9 +6,17 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Gimmick Gecko — Contest Math Practice" },
-      { name: "description", content: "Practice math contest problems with a pixel gecko coach: progressive hints, a filterable problem bank, and a skill dashboard that tracks every concept." },
+      {
+        name: "description",
+        content:
+          "Practice math contest problems with a pixel gecko coach: progressive hints, a filterable problem bank, and a skill dashboard that tracks every concept.",
+      },
       { property: "og:title", content: "Gimmick Gecko — Contest Math Practice" },
-      { property: "og:description", content: "Progressive gecko hints, a concept-filtered problem bank, and a dashboard that finds your weakest concepts." },
+      {
+        property: "og:description",
+        content:
+          "Progressive gecko hints, a concept-filtered problem bank, and a dashboard that finds your weakest concepts.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -22,8 +30,10 @@ const features = [
     title: "Progressive hints",
     body: (
       <>
-        Paste a problem or snap a photo. The gecko names the <strong className="font-semibold text-foreground">key concepts</strong>, reveals the{" "}
-        <strong className="font-semibold text-highlight">hidden gimmick</strong>, then drops hints one step at a time — never the whole solution at once.
+        Paste a problem or snap a photo. The gecko names the{" "}
+        <strong className="font-semibold text-foreground">key concepts</strong>, reveals the{" "}
+        <strong className="font-semibold text-highlight">hidden gimmick when you ask</strong>, then
+        drops hints one step at a time.
       </>
     ),
   },
@@ -32,7 +42,8 @@ const features = [
     title: "A voice that teaches",
     body: (
       <>
-        Every hint is <strong className="font-semibold text-foreground">read aloud</strong> in the gecko's warm old-professor voice. Auto-read is on by default; stop it any time.
+        Every hint is <strong className="font-semibold text-foreground">read aloud</strong> in the
+        gecko's warm old-professor voice. Auto-read is on by default; stop it any time.
       </>
     ),
   },
@@ -41,8 +52,9 @@ const features = [
     title: "A real problem bank",
     body: (
       <>
-        Past <strong className="font-semibold text-foreground">AIME problems</strong> you can filter by the concepts they require, each rated{" "}
-        <strong className="font-semibold text-accent">one to five stars</strong>. Check your answer right on the card.
+        Train across contests or focus on your next competition. Filter by topic and estimated
+        difficulty from <strong className="font-semibold text-accent">one to five stars</strong>.
+        Check your answer right on the card.
       </>
     ),
   },
@@ -51,7 +63,9 @@ const features = [
     title: "A dashboard that knows you",
     body: (
       <>
-        A free account turns every checked answer into a <strong className="font-semibold text-foreground">per-concept skill graph</strong> and recommends bank problems that target your{" "}
+        A free account turns every checked answer into a{" "}
+        <strong className="font-semibold text-foreground">per-concept skill graph</strong> and
+        recommends bank problems that target your{" "}
         <strong className="font-semibold text-accent">weakest concepts</strong>.
       </>
     ),
@@ -63,13 +77,15 @@ function HomePage() {
     <main className="mx-auto max-w-6xl px-4 py-12">
       <section className="mb-16 grid items-center gap-10 lg:grid-cols-[1fr_280px]">
         <div>
-          <p className="mb-4 font-pixel text-[10px] uppercase text-accent">Your contest math coach</p>
+          <p className="mb-4 font-pixel text-[10px] uppercase text-accent">
+            Your contest math coach
+          </p>
           <h1 className="mb-5 font-pixel text-2xl leading-relaxed text-primary sm:text-4xl sm:leading-relaxed">
             Stuck on a problem? <span className="text-foreground">Ask the gecko.</span>
           </h1>
           <p className="mb-8 max-w-xl text-lg leading-relaxed text-muted-foreground">
-            Gimmick Gecko trains you for math contests the way a coach would: hints before answers, gimmicks before grinding,
-            and a record of exactly which concepts need work.
+            Gimmick Gecko trains you for math contests the way a coach would: hints before answers,
+            gimmicks before grinding, and a record of exactly which concepts need work.
           </p>
           <div className="flex flex-wrap items-center gap-4">
             <Link
@@ -78,17 +94,30 @@ function HomePage() {
             >
               Ask the gecko <ArrowRight className="h-5 w-5" />
             </Link>
-            <Link to="/problems" className="px-2 py-1 text-lg text-muted-foreground underline underline-offset-4 hover:text-foreground">
+            <Link
+              to="/problems"
+              className="px-2 py-1 text-lg text-muted-foreground underline underline-offset-4 hover:text-foreground"
+            >
               or browse the problem bank
             </Link>
           </div>
         </div>
-        <img src={geckoImg} alt="Gimmick Gecko, a pixel-art professor gecko" width={1024} height={1024} className="pixelated mx-auto w-52 animate-gecko lg:w-64" />
+        <img
+          src={geckoImg}
+          alt="Gimmick Gecko, a pixel-art professor gecko"
+          width={1024}
+          height={1024}
+          className="pixelated mx-auto w-52 animate-gecko lg:w-64"
+        />
       </section>
 
       <section className="mb-16">
-        <h2 className="mb-2 font-pixel text-sm text-primary sm:text-base">Everything you need to train</h2>
-        <p className="mb-8 text-muted-foreground">Four tools, one feedback loop: practice, check, review, repeat.</p>
+        <h2 className="mb-2 font-pixel text-sm text-primary sm:text-base">
+          Everything you need to train
+        </h2>
+        <p className="mb-8 text-muted-foreground">
+          Four tools, one feedback loop: practice, check, review, repeat.
+        </p>
         <div className="grid gap-6 sm:grid-cols-2">
           {features.map((f) => (
             <article key={f.title} className="bg-card p-6 pixel-box">
@@ -101,7 +130,9 @@ function HomePage() {
       </section>
 
       <section className="bg-panel p-8 text-center pixel-box-lg">
-        <h2 className="mb-3 font-pixel text-sm text-primary sm:text-base">Ready for your first gimmick?</h2>
+        <h2 className="mb-3 font-pixel text-sm text-primary sm:text-base">
+          Ready for your first gimmick?
+        </h2>
         <p className="mx-auto mb-6 max-w-md text-muted-foreground">
           Bring a problem that's been beating you. The gecko will meet you where you are.
         </p>

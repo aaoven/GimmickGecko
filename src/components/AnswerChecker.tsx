@@ -7,7 +7,13 @@ import { useAccount } from "@/components/AccountSession";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export function AnswerChecker({ answer, problemId }: { answer: string | null; problemId?: string | undefined }) {
+export function AnswerChecker({
+  answer,
+  problemId,
+}: {
+  answer: string | null;
+  problemId?: string | undefined;
+}) {
   const [value, setValue] = useState("");
   const [result, setResult] = useState<"correct" | "wrong" | null>(null);
   const [stars, setStars] = useState<{ earned: number; possible: number } | null>(null);
@@ -24,8 +30,8 @@ export function AnswerChecker({ answer, problemId }: { answer: string | null; pr
         e.preventDefault();
         if (busy || !value.trim()) return;
         setError("");
-        const correct = isCorrectAnswer(value, answer);
-        setResult(correct ? "correct" : "wrong");
+        setResult(null);
+        setStars(null);
         if (problemId && user) {
           setBusy(true);
           try {
@@ -34,17 +40,23 @@ export function AnswerChecker({ answer, problemId }: { answer: string | null; pr
             setStars({ earned: saved.earnedStars, possible: saved.possibleStars });
             await queryClient.invalidateQueries({ queryKey: ["attempts"] });
             await queryClient.invalidateQueries({ queryKey: ["recommendations"] });
-          } catch { setError("Your answer could not be saved. Please try again."); }
-          finally { setBusy(false); }
-        }
+          } catch {
+            setError("Your answer could not be checked or saved. Please try again.");
+          } finally {
+            setBusy(false);
+          }
+        } else setResult(isCorrectAnswer(value, answer) ? "correct" : "wrong");
       }}
     >
       <Input
         value={value}
+        disabled={busy}
+        maxLength={1000}
         onChange={(e) => {
           setValue(e.target.value);
           setResult(null);
           setStars(null);
+          setError("");
         }}
         placeholder="Your answer"
         aria-label="Your answer"
@@ -58,7 +70,11 @@ export function AnswerChecker({ answer, problemId }: { answer: string | null; pr
           Correct! {stars && `${stars.earned}/${stars.possible} stars`}
         </p>
       )}
-      {error && <p role="alert" className="text-destructive">{error}</p>}
+      {error && (
+        <p role="alert" className="text-destructive">
+          {error}
+        </p>
+      )}
       {result === "wrong" && (
         <p role="status" className="text-destructive">
           Not quite — try again, or ask the gecko for a hint.

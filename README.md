@@ -33,3 +33,11 @@ View and edit your account details and information! You can also view a breakdow
 
 # This project was built with [Lovable](https://lovable.dev). 💞
 
+Developer setup: install dependencies with `bun install --frozen-lockfile`, then
+run `bun run dev`. Run `bun run test`, `bun run test:data`, and `bun run build`
+before pushing changes. Server and browser Supabase variables are provided by
+Lovable; AI keys stay in managed server secrets.
+
+For the combined contest database, source diagrams, related practice, and safe
+import instructions, see [docs/CONTEST_DATA.md](docs/CONTEST_DATA.md).
+
