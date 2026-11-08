@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { BarChart3, LogOut, Save, Target, UserRound } from "lucide-react";
 import { getProfile, saveProfile } from "@/lib/account.functions";
 import { getMyAttempts, getRecommendations } from "@/lib/attempts.functions";
-import { accuracy, computeSkillBreakdown } from "@/lib/skills";
+import { computeStarBreakdown } from "@/lib/skills";
 import { profileSchema } from "@/lib/account-schema";
 import { useAccount } from "@/components/AccountSession";
 import { AccountField } from "@/components/AccountFields";
@@ -33,8 +33,8 @@ function AccountPage() {
   const query = useQuery({ queryKey: ["profile", user?.id], queryFn: () => fetchProfile() });
   const attemptsQuery = useQuery({ queryKey: ["attempts", user?.id], queryFn: () => fetchAttempts() });
   const recsQuery = useQuery({ queryKey: ["recommendations", user?.id], queryFn: () => fetchRecommendations() });
-  const stats = useMemo(() => computeSkillBreakdown(attemptsQuery.data ?? []), [attemptsQuery.data]);
-  const maxTotal = Math.max(1, ...stats.map((s) => s.total));
+  const stats = useMemo(() => computeStarBreakdown(attemptsQuery.data ?? []), [attemptsQuery.data]);
+  const maxTotal = Math.max(1, ...stats.map((s) => s.possible));
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
@@ -62,7 +62,7 @@ function AccountPage() {
     {error && <p role="alert" className="mt-4 text-destructive">{error}</p>}{saved && <p role="status" className="mt-4 text-primary">Profile saved.</p>}
     <section className="mt-10 border-t-4 border-border pt-6">
       <div className="mb-1 flex items-center gap-3"><BarChart3 className="h-6 w-6 text-accent" /><h2 className="font-pixel text-sm text-primary">Skillset breakdown</h2></div>
-      <p className="mb-5 text-sm text-muted-foreground">How you're doing on each concept, from the bank answers you've checked.</p>
+      <p className="mb-5 text-sm text-muted-foreground">Stars earned per concept. A correct answer earns the problem's star rating, minus one per hint used (never below zero). Your best score on each problem counts.</p>
       {attemptsQuery.isPending ? (
         <p role="status">Loading your skillset…</p>
       ) : attemptsQuery.isError ? (
@@ -76,18 +76,18 @@ function AccountPage() {
               <li key={s.concept}>
                 <div className="mb-1 flex items-baseline justify-between gap-3">
                   <span className="font-pixel text-[9px] uppercase">{s.concept}</span>
-                  <span className="text-sm text-muted-foreground">{s.correct}/{s.total} correct · {accuracy(s)}%</span>
+                  <span className="text-sm text-muted-foreground"><span className="text-accent">★</span> {s.earned}/{s.possible} stars · {s.problems} {s.problems === 1 ? "problem" : "problems"}</span>
                 </div>
-                <div className="flex h-4 w-full bg-secondary" role="img" aria-label={`${s.concept}: ${s.correct} of ${s.total} correct`}>
-                  <div className="h-full bg-primary" style={{ width: `${(s.correct / maxTotal) * 100}%` }} />
-                  <div className="h-full bg-destructive" style={{ width: `${((s.total - s.correct) / maxTotal) * 100}%` }} />
+                <div className="flex h-4 w-full bg-secondary" role="img" aria-label={`${s.concept}: ${s.earned} of ${s.possible} stars`}>
+                  <div className="h-full bg-primary" style={{ width: `${(s.earned / maxTotal) * 100}%` }} />
+                  <div className="h-full bg-muted-foreground/40" style={{ width: `${((s.possible - s.earned) / maxTotal) * 100}%` }} />
                 </div>
               </li>
             ))}
           </ul>
           <div className="mt-3 flex gap-4 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 bg-primary" /> Correct</span>
-            <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 bg-destructive" /> Missed</span>
+            <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 bg-primary" /> Stars earned</span>
+            <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 bg-muted-foreground/40" /> Stars not earned</span>
           </div>
         </>
       )}

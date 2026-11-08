@@ -20,11 +20,14 @@ export const getMyAttempts = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("attempts")
-      .select("correct, problems(concepts)")
+      .select("problem_id, correct, earned_stars, possible_stars, problems(concepts)")
       .order("created_at", { ascending: true });
     if (error) throw new Error("Your attempts could not be loaded.");
     return (data ?? []).map((row) => ({
+      problemId: row.problem_id,
       correct: row.correct,
+      earnedStars: row.earned_stars,
+      possibleStars: row.possible_stars,
       concepts: (row.problems as unknown as { concepts: string[] } | null)?.concepts ?? [],
     }));
   });
