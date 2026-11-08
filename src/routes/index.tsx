@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, BarChart3, BookOpen, Lightbulb, Volume2 } from "lucide-react";
 import geckoImg from "@/assets/gecko.png";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -72,12 +73,9 @@ function HomePage() {
             and a record of exactly which concepts need work.
           </p>
           <div className="flex flex-wrap items-center gap-4">
-            <Link
-              to="/ask"
-              className="inline-flex items-center gap-3 bg-primary px-8 py-5 font-pixel text-xs text-primary-foreground pixel-box-lg transition hover:brightness-110 sm:text-sm"
-            >
-              Ask the gecko <ArrowRight className="h-5 w-5" />
-            </Link>
+            <Button asChild size="lg" className="h-auto gap-3 px-8 py-5 pixel-box-lg sm:text-sm">
+              <Link to="/ask">Ask the gecko <ArrowRight className="h-5 w-5" /></Link>
+            </Button>
             <Link to="/problems" className="px-2 py-1 text-lg text-muted-foreground underline underline-offset-4 hover:text-foreground">
               or browse the problem bank
             </Link>
@@ -105,12 +103,9 @@ function HomePage() {
         <p className="mx-auto mb-6 max-w-md text-muted-foreground">
           Bring a problem that's been beating you. The gecko will meet you where you are.
         </p>
-        <Link
-          to="/ask"
-          className="inline-flex items-center gap-3 bg-primary px-8 py-5 font-pixel text-xs text-primary-foreground pixel-box transition hover:brightness-110 sm:text-sm"
-        >
-          Ask the gecko <ArrowRight className="h-5 w-5" />
-        </Link>
+        <Button asChild size="lg" className="h-auto gap-3 px-8 py-5 sm:text-sm">
+          <Link to="/ask">Ask the gecko <ArrowRight className="h-5 w-5" /></Link>
+        </Button>
       </section>
     </main>
   );

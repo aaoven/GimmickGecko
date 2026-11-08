@@ -63,6 +63,8 @@
   --ring: oklch(0.86 0.21 130);
   --shadow-pixel: 4px 4px 0 0 var(--border);
   --shadow-pixel-lg: 6px 6px 0 0 var(--border);
+  --interaction-duration: 160ms;
+  --interaction-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @layer base {
@@ -77,6 +79,29 @@
       linear-gradient(color-mix(in oklab, var(--primary) 6%, transparent) 1px, transparent 1px),
       linear-gradient(90deg, color-mix(in oklab, var(--primary) 6%, transparent) 1px, transparent 1px);
     background-size: 24px 24px;
+  }
+  button, a, label:has(input[type="file"]), input, textarea, select {
+    transition-property: background-color, color, border-color, box-shadow, filter, transform, translate, opacity;
+    transition-duration: var(--interaction-duration);
+    transition-timing-function: var(--interaction-ease);
+  }
+  button:not(:disabled), label:has(input[type="file"]) {
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+}
+
+@utility interaction-button {
+  @media (hover: hover) and (pointer: fine) {
+    &:not(:disabled):not([aria-disabled="true"]):hover {
+      translate: 0 -2px;
+    }
+  }
+  &:not(:disabled):not([aria-disabled="true"]):active {
+    translate: 1px 1px;
   }
 }
 
@@ -104,4 +129,14 @@
 }
 @utility animate-caret {
   animation: blink-caret 1s steps(1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+    translate: none !important;
+  }
 }
