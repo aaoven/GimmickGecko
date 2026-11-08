@@ -140,12 +140,11 @@ function RootComponent() {
           </Link>
           <nav className="flex flex-wrap items-center gap-1 font-pixel text-[10px] uppercase">
             <Link
-              to="/"
-              activeOptions={{ exact: true }}
+              to="/ask"
               className="px-3 py-2 hover:bg-secondary"
               activeProps={{ className: "bg-primary text-primary-foreground" }}
             >
-              Hints
+              Ask the gecko
             </Link>
             <AccountLink />
             <Link

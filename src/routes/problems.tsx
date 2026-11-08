@@ -118,7 +118,7 @@ function ProblemsPage() {
                 ))}
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <Link to="/" search={{ problem: stripMathDelimiters(p.statement) }} className={buttonVariants({ size: "sm" })}>
+                <Link to="/ask" search={{ problem: stripMathDelimiters(p.statement) }} className={buttonVariants({ size: "sm" })}>
                   Get gecko hints
                 </Link>
                 <button
