@@ -10,14 +10,22 @@ const bank = [
 ];
 
 describe("weakestConcepts", () => {
-  it("orders concepts by lowest accuracy first", () => {
+  it("orders concepts by lowest earned-star percentage first", () => {
     const weak = weakestConcepts([
-      { correct: true, concepts: ["Algebra"] },
-      { correct: true, concepts: ["Algebra"] },
-      { correct: false, concepts: ["Geometry"] },
-      { correct: false, concepts: ["Geometry"] },
+      { problemId: "a", correct: true, concepts: ["Algebra"], earnedStars: 1, possibleStars: 1 },
+      { problemId: "a", correct: true, concepts: ["Algebra"], earnedStars: 1, possibleStars: 1 },
+      { problemId: "g", correct: false, concepts: ["Geometry"], earnedStars: 0, possibleStars: 2 },
+      { problemId: "g", correct: false, concepts: ["Geometry"], earnedStars: 0, possibleStars: 2 },
     ]);
     expect(weak.map((s) => s.concept)).toEqual(["Geometry", "Algebra"]);
+  });
+
+  it("treats correct answers with hint penalties as weaker than full-star answers", () => {
+    const weak = weakestConcepts([
+      { problemId: "a", correct: true, concepts: ["Algebra"], earnedStars: 1, possibleStars: 5 },
+      { problemId: "g", correct: true, concepts: ["Geometry"], earnedStars: 2, possibleStars: 2 },
+    ]);
+    expect(weak.map((s) => s.concept)).toEqual(["Algebra", "Geometry"]);
   });
 
   it("returns nothing with no attempts", () => {
@@ -29,8 +37,8 @@ describe("recommendProblems", () => {
   it("suggests unsolved problems targeting the weakest concepts", () => {
     const recs = recommendProblems(
       [
-        { problemId: "p1", correct: true, concepts: ["Algebra"] },
-        { problemId: "p2", correct: false, concepts: ["Geometry"] },
+        { problemId: "p1", correct: true, concepts: ["Algebra"], earnedStars: 1, possibleStars: 1 },
+        { problemId: "p2", correct: false, concepts: ["Geometry"], earnedStars: 0, possibleStars: 1 },
       ],
       bank,
     );
@@ -40,7 +48,7 @@ describe("recommendProblems", () => {
 
   it("never suggests a problem already solved correctly", () => {
     const recs = recommendProblems(
-      [{ problemId: "p2", correct: true, concepts: ["Geometry"] }],
+      [{ problemId: "p2", correct: true, concepts: ["Geometry"], earnedStars: 1, possibleStars: 1 }],
       bank,
     );
     expect(recs.map((p) => p.id)).not.toContain("p2");
@@ -49,8 +57,8 @@ describe("recommendProblems", () => {
   it("prefers problems hitting more weak concepts, then easier ones", () => {
     const recs = recommendProblems(
       [
-        { problemId: "p1", correct: false, concepts: ["Algebra"] },
-        { problemId: "p2", correct: false, concepts: ["Geometry"] },
+        { problemId: "p1", correct: false, concepts: ["Algebra"], earnedStars: 0, possibleStars: 1 },
+        { problemId: "p2", correct: false, concepts: ["Geometry"], earnedStars: 0, possibleStars: 1 },
       ],
       bank,
     );
@@ -59,7 +67,7 @@ describe("recommendProblems", () => {
 
   it("falls back to the easiest unsolved problems when no weak concept matches", () => {
     const recs = recommendProblems(
-      [{ problemId: "p2", correct: false, concepts: ["Counting"] }],
+      [{ problemId: "p2", correct: false, concepts: ["Counting"], earnedStars: 0, possibleStars: 1 }],
       bank,
     );
     expect(recs.map((p) => p.id)).toEqual(["p1", "p4", "p5", "p2"]);
@@ -67,7 +75,7 @@ describe("recommendProblems", () => {
 
   it("is empty with no attempts or when the whole bank is solved", () => {
     expect(recommendProblems([], bank)).toEqual([]);
-    const allSolved = bank.map((p) => ({ problemId: p.id, correct: true, concepts: p.concepts }));
+    const allSolved = bank.map((p) => ({ problemId: p.id, correct: true, concepts: p.concepts, earnedStars: p.difficulty, possibleStars: p.difficulty }));
     expect(recommendProblems(allSolved, bank)).toEqual([]);
   });
 });

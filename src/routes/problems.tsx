@@ -2,7 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { listProblems } from "@/lib/problems.functions";
-import { stripMathDelimiters } from "@/lib/math-text";
+import { useServerFn } from "@tanstack/react-start";
+import { useAccount } from "@/components/AccountSession";
+import { saveProblemHelp } from "@/lib/attempts.functions";
+import { toast } from "sonner";
 import { AnswerChecker } from "@/components/AnswerChecker";
 import { DifficultyStars } from "@/components/DifficultyStars";
 import { MathText } from "@/components/MathText";
@@ -14,7 +17,7 @@ export const Route = createFileRoute("/problems")({
   head: () => ({
     meta: [
       { title: "Problem Bank — Gimmick Gecko" },
-      { name: "description", content: "Browse past AIME and contest problems filtered by the concepts needed to solve them." },
+      { name: "description", content: "Browse AIME, AMC, Euclid, CEMC Fermat and COMC problems filtered by the concepts needed to solve them." },
       { property: "og:title", content: "Problem Bank — Gimmick Gecko" },
       { property: "og:description", content: "Filter past contest problems by concept and practice with gecko hints." },
       { property: "og:type", content: "website" },
@@ -26,9 +29,12 @@ export const Route = createFileRoute("/problems")({
 });
 
 function ProblemsPage() {
+  const saveHelp = useServerFn(saveProblemHelp);
+  const { user } = useAccount();
   const { data: problems } = useSuspenseQuery(problemsQuery);
   const [selected, setSelected] = useState<string[]>([]);
   const [contest, setContest] = useState("All");
+  const [difficulty, setDifficulty] = useState(0);
   const [openAnswer, setOpenAnswer] = useState<string | null>(null);
 
   const concepts = useMemo(() => {
@@ -40,7 +46,9 @@ function ProblemsPage() {
 
   const filtered = problems.filter(
     (p) =>
-      (contest === "All" || p.contest === contest) && selected.every((c) => p.concepts.includes(c)),
+      (contest === "All" || p.contest === contest) &&
+      (difficulty === 0 || p.difficulty === difficulty) &&
+      selected.every((c) => p.concepts.includes(c)),
   );
 
   const toggle = (c: string) =>
@@ -63,6 +71,21 @@ function ProblemsPage() {
                   className={`px-2 py-1 font-pixel text-[9px] uppercase ${contest === c ? "bg-primary text-primary-foreground" : "bg-secondary"}`}
                 >
                   {c}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="mb-2 font-pixel text-[10px] uppercase text-muted-foreground">Difficulty</div>
+            <div className="flex flex-wrap gap-2">
+              {[0, 1, 2, 3, 4, 5].map((d) => (
+                <button
+                  key={d}
+                  onClick={() => setDifficulty(d)}
+                  aria-label={d === 0 ? "Any difficulty" : `Difficulty ${d} out of 5 stars`}
+                  className={`px-2 py-1 font-pixel text-[9px] ${difficulty === d ? "bg-primary text-primary-foreground" : "bg-secondary"}`}
+                >
+                  {d === 0 ? "All" : <span className={difficulty === d ? undefined : "text-accent"}>{"★".repeat(d)}</span>}
                 </button>
               ))}
             </div>
@@ -118,11 +141,17 @@ function ProblemsPage() {
                 ))}
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <Link to="/ask" search={{ problem: stripMathDelimiters(p.statement) }} className={buttonVariants({ size: "sm" })}>
+                <Link to="/ask" search={{ problem: p.statement, problemId: p.id }} className={buttonVariants({ size: "sm" })}>
                   Get gecko hints
                 </Link>
                 <button
-                  onClick={() => setOpenAnswer(openAnswer === p.id ? null : p.id)}
+                  onClick={async () => {
+                    if (openAnswer === p.id) { setOpenAnswer(null); return; }
+                    try {
+                      if (user) await saveHelp({ data: { problemId: p.id, hints: 0, answerRevealed: true } });
+                      setOpenAnswer(p.id);
+                    } catch { toast.error("Could not save answer reveal. Try again."); }
+                  }}
                   className={buttonVariants({ size: "sm", variant: "secondary" })}
                 >
                   {openAnswer === p.id ? `Answer: ${p.answer}` : "Show answer"}

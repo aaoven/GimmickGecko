@@ -6,13 +6,19 @@ import { toast } from "sonner";
 import geckoImg from "@/assets/gecko.png";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { AnswerChecker } from "@/components/AnswerChecker";
+import { useAccount } from "@/components/AccountSession";
+import { saveProblemHelp } from "@/lib/attempts.functions";
 import { getHints } from "@/lib/hints.functions";
 import type { HintResult } from "@/lib/hints.server";
 
-export function HintCoach({ initialProblem = "" }: { initialProblem?: string }) {
+export function HintCoach({ initialProblem = "", problemId }: { initialProblem?: string; problemId?: string | undefined }) {
+  const { user } = useAccount();
+  const saveHelp = useServerFn(saveProblemHelp);
+  const [savingHelp, setSavingHelp] = useState(false);
   const fetchHints = useServerFn(getHints);
   const [problem, setProblem] = useState(initialProblem);
   const [image, setImage] = useState<string | undefined>();
+  const bankProblemId = problem === initialProblem && !image ? problemId : undefined;
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<HintResult | null>(null);
   const [revealed, setRevealed] = useState(0);
@@ -49,11 +55,20 @@ export function HintCoach({ initialProblem = "" }: { initialProblem?: string }) 
     }
   }
 
-  function nextHint() {
-    if (!result) return;
-    const i = revealed;
-    setRevealed(i + 1);
-    if (voiceOn) void speak(`Hint ${i + 1}. ${result.hints[i]}`);
+  async function revealHelp(answer = false) {
+    if (!result || savingHelp) return;
+    if (answer && showAnswer) { setShowAnswer(false); return; }
+    const next = answer ? revealed : revealed + 1;
+    setSavingHelp(true);
+    try {
+      if (bankProblemId && user) await saveHelp({ data: { problemId: bankProblemId, hints: next, answerRevealed: answer } });
+      if (answer) setShowAnswer(true);
+      else {
+        setRevealed(next);
+        if (voiceOn) void speak(`Hint ${next}. ${result.hints[revealed]}`);
+      }
+    } catch { toast.error("Your hint usage could not be saved. Try again."); }
+    finally { setSavingHelp(false); }
   }
 
   function onFile(file?: File) {
@@ -163,11 +178,11 @@ export function HintCoach({ initialProblem = "" }: { initialProblem?: string }) 
             </ol>
             <div className="flex flex-wrap gap-3">
               {revealed < result.hints.length && (
-                <Button onClick={nextHint}>
+                <Button onClick={() => void revealHelp()} disabled={savingHelp}>
                   Next hint ({revealed + 1}/{result.hints.length})
                 </Button>
               )}
-              <Button variant="accent" onClick={() => setShowAnswer((s) => !s)}>
+              <Button variant="accent" onClick={() => void revealHelp(true)} disabled={savingHelp}>
                 {showAnswer ? "Hide answer" : "Reveal answer"}
               </Button>
             </div>
@@ -176,7 +191,7 @@ export function HintCoach({ initialProblem = "" }: { initialProblem?: string }) 
                 Answer: {result.answer}
               </div>
             )}
-            {!showAnswer && revealed < result.hints.length && <AnswerChecker answer={result.answer} />}
+            {!showAnswer && revealed < result.hints.length && <AnswerChecker answer={result.answer} problemId={bankProblemId} />}
           </div>
         )}
       </section>

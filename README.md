@@ -1,24 +1,35 @@
-# GitHub Project Link
+# Presenting: Gimmick Gecko 🦎
+### We are the Chaffey-Burkers: Max Shen, Owen Yang, Alex Ma, Newky Li
 
-can i link a project here to a github repo
+We are the minds behind Gimmick-Gecko, a website dedicated to making math contest prep intuitive and fun!
 
-This project was built with [Lovable](https://lovable.dev).
+## What makes Gimmick Gecko special? ⭐
+Tired of failing math competitions? Running out of time? Sick of all the gimmicks? Look no further! 
 
-## Build with Lovable
+Nowadays math contests revolve less around pure logic and problem-solving abilities than pattern-recognition and gimmicky short-cuts. 
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/bd9a03c1-19c9-4d30-86fb-2ec7889e7df8).
+Gimmick Gecko combines the best of both worlds: identifying the key “gimmicks” and concepts behind math problems while clearly explaining the logic and reasoning needed to solve them. With personalized feedback, beginner-friendly explanations, and your very own gecko mascot guiding you along the way, you'll learn not just how to solve problems, but how to think through them.
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+# Navigating Gimmick Gecko 🧭:
 
-## Development
+### Account Login 🔒
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Sign up or login with your email to receive personally tailored feedback, skillset breakdowns, and recommended problems.
 
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
-```
+
+### Home Page 🏠
+The Home page introduces Gimmick Gecko and its mission to help students improve their math competition skills. You can also access past problems, upload your own questions, and check your progress.
+
+### Ask-the-Gecko Page 🗣️
+Either type the problem into the designated question box or upload an image of your problem. Gimmick Gecko will provide 4 hints that you can reveal one by one until you finally type the correct answer. Still stuck? Reveal the answer and read the full breakdown of the question!
+
+
+### Problems Bank ✖️➗
+A bank filled with problems from multiple math contests. Filter by concept, difficulty, contest name, and more! You can check your answer, reveal the answer, or get Gecko Hints if you're stuck!
+
+### Account Page 👤
+View and edit your account details and information! You can also view a breakdown of your skillsets and a recommended problem! 
+
+
+# This project was built with [Lovable](https://lovable.dev). 💞
+
