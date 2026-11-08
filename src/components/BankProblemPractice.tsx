@@ -21,6 +21,8 @@ export function BankProblemPractice({ problem, hintsUsed, answerRevealed, solved
   const fetchHints = useServerFn(getHints);
   const saveHelp = useServerFn(saveProblemHelp);
   const [hints, setHints] = useState<string[] | null>(null);
+  const [visibleHints, setVisibleHints] = useState(0);
+  const [gimmick, setGimmick] = useState("");
   const [localHints, setLocalHints] = useState(0);
   const [localSolved, setLocalSolved] = useState(false);
   const [revealedAnswer, setRevealedAnswer] = useState(false);
@@ -42,11 +44,14 @@ export function BankProblemPractice({ problem, hintsUsed, answerRevealed, solved
         if (!response.ok) { toast.error(response.error); return; }
         nextHints = response.result.hints;
         setHints(nextHints);
+        setGimmick(response.result.gimmick);
+        return;
       }
-      const next = answer ? used : Math.min(used + 1, nextHints?.length ?? used);
+      const nextVisible = Math.min(visibleHints + 1, nextHints?.length ?? visibleHints);
+      const next = answer ? used : Math.max(used, nextVisible);
       if (user) await saveHelp({ data: { problemId: problem.id, hints: next, answerRevealed: answer } });
       if (answer) { setRevealedAnswer(true); setShowAnswer(true); }
-      else setLocalHints(next);
+      else { setLocalHints(next); setVisibleHints(nextVisible); }
       if (user) await queryClient.invalidateQueries({ queryKey: ["bank-progress"] });
     } catch { toast.error("Could not load or save your help. Please try again."); }
     finally { setBusy(false); }
@@ -54,9 +59,9 @@ export function BankProblemPractice({ problem, hintsUsed, answerRevealed, solved
 
   return <>
     <div className="flex flex-wrap items-center gap-3">
-      <Button size="sm" disabled={busy || !ready || !!hints && used >= hints.length} onClick={() => void reveal()} aria-controls={`hints-${problem.id}`} aria-expanded={!!hints}>
+      <Button size="sm" disabled={busy || !ready || !!hints && visibleHints >= hints.length} onClick={() => void reveal()} aria-controls={`hints-${problem.id}`} aria-expanded={!!hints}>
         {busy ? <Loader2 className="animate-spin" /> : null}
-        {!hints ? "Get gecko hints" : used >= hints.length ? "All hints shown" : `Next hint (${used + 1}/${hints.length})`}
+        {!hints ? "Get gecko hints" : visibleHints >= hints.length ? "All hints shown" : `Next hint (${visibleHints + 1}/${hints.length})`}
       </Button>
       <Button size="sm" variant="secondary" disabled={busy || !ready} onClick={() => void reveal(true)} aria-expanded={showAnswer}>
         {showAnswer ? "Hide answer" : "Reveal answer"}
@@ -68,7 +73,8 @@ export function BankProblemPractice({ problem, hintsUsed, answerRevealed, solved
     </div>
     {hints && <div id={`hints-${problem.id}`} className="mt-5 border-t border-border pt-4">
       <div className="mb-3 flex items-center gap-3"><img src={gecko} alt="" className="pixelated h-12 w-12" /><h2 className="font-pixel text-[10px] text-primary">Gecko hints</h2></div>
-      <ol className="space-y-3">{hints.slice(0, used).map((hint, i) => <li key={i} className="border-l-2 border-primary pl-3"><div className="mb-1 font-pixel text-[9px] text-primary">Hint {i + 1}</div><p className="break-words text-lg"><MathText text={hint} /></p></li>)}</ol>
+      <div className="mb-4 text-highlight-foreground"><div className="mb-1 font-pixel text-[9px] text-accent">The gimmick</div><p className="break-words text-lg"><MathText text={gimmick} /></p></div>
+      <ol aria-live="polite" className="space-y-3">{hints.slice(0, visibleHints).map((hint, i) => <li key={i} className="border-l-2 border-primary pl-3"><div className="mb-1 font-pixel text-[9px] text-primary">Hint {i + 1}</div><p className="break-words text-lg"><MathText text={hint} /></p></li>)}</ol>
     </div>}
     {showAnswer && <p className="mt-4 break-words text-lg text-primary" role="status">Answer: <MathText text={problem.answer ?? "Unavailable"} /></p>}
     {!showAnswer && <AnswerChecker answer={problem.answer} problemId={problem.id} disabled={!ready || busy} onChecked={(correct) => { if (correct) setLocalSolved(true); }} />}
