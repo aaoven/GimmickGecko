@@ -8,7 +8,7 @@ Tired of failing math competitions? Running out of time? Sick of all the gimmick
 
 Nowadays math contests revolve less around pure logic and problem-solving abilities than pattern-recognition and gimmicky short-cuts. 
 
-Gimmick Gecko takes the best of both worlds-identifying the "gimmicks" and concepts associated with a problem while still explaining the logic and reasoning behind it. Here you will receive personally tailored feedback and analysis, beginner-friendly explanations, and your very own gecko that points out gimmicks!
+Gimmick Gecko combines the best of both worlds: identifying the key “gimmicks” and concepts behind math problems while clearly explaining the logic and reasoning needed to solve them. With personalized feedback, beginner-friendly explanations, and your very own gecko mascot guiding you along the way, you'll learn not just how to solve problems, but how to think through them.
 
 #### Navigating Gimmick Gecko 🧭:
 
