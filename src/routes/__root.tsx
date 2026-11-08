@@ -16,7 +16,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AccountSession, useAccount } from "@/components/AccountSession";
 import { Button } from "@/components/ui/button";
-import { UserRound } from "lucide-react";
+import { ArrowLeft, UserRound } from "lucide-react";
 
 function NotFoundComponent() {
   return (
@@ -134,9 +134,13 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <header className="border-b-4 border-border bg-panel">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4">
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/" className="group flex items-center gap-3">
             <img src={geckoImg} alt="" width={40} height={40} className="pixelated h-10 w-10" />
             <span className="font-pixel text-xs text-primary sm:text-sm">Gimmick Gecko</span>
+            <span className="flex items-center gap-1 font-pixel text-[9px] uppercase text-muted-foreground group-hover:text-accent">
+              <ArrowLeft aria-hidden="true" className="h-4 w-4 shrink-0 text-accent" />
+              Home
+            </span>
           </Link>
           <nav className="flex flex-wrap items-center gap-1 font-pixel text-[10px] uppercase">
             <Link
