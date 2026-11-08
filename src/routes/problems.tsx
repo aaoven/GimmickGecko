@@ -65,7 +65,7 @@ function ProblemsPage() {
       <p className="mb-8 text-lg text-muted-foreground">Pick concepts to find problems that need all of them.</p>
 
       <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
-        <aside className="h-fit space-y-6 bg-card p-4 pixel-box lg:sticky lg:top-6">
+        <aside className="h-fit max-h-[70vh] space-y-6 overflow-y-auto bg-card p-4 pixel-box lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)]">
           <div>
             <div className="mb-2 font-pixel text-[10px] uppercase text-muted-foreground">Available stars</div>
             <div className="flex flex-wrap gap-2">
