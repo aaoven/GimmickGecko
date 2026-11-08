@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { MathKeyboard } from "@/components/MathKeyboard";
 import { MathText } from "@/components/MathText";
 
-export function AnswerChecker({ answer, problemId, customId, onChecked, disabled = false }: { answer: string | null; problemId?: string | undefined; customId?: string | null | undefined; onChecked?: (correct: boolean) => void; disabled?: boolean }) {
+export function AnswerChecker({ answer, problemId, customId, onChecked, disabled = false }: { answer: string | null; problemId?: string | undefined; customId?: string | null | undefined; onChecked?: (correct: boolean, earnedStars?: number) => void; disabled?: boolean }) {
   const [value, setValue] = useState("");
   const [result, setResult] = useState<"correct" | "wrong" | null>(null);
   const [stars, setStars] = useState<{ earned: number; possible: number } | null>(null);
@@ -55,7 +55,7 @@ export function AnswerChecker({ answer, problemId, customId, onChecked, disabled
             if (!saved) return;
             setResult(saved.correct ? "correct" : "wrong");
             setStars({ earned: saved.earnedStars, possible: saved.possibleStars });
-            onChecked?.(saved.correct);
+            onChecked?.(saved.correct, saved.earnedStars);
             await queryClient.invalidateQueries({ queryKey: ["bank-progress"] });
             await queryClient.invalidateQueries({ queryKey: ["attempts"] });
             await queryClient.invalidateQueries({ queryKey: ["recommendations"] });

@@ -32,6 +32,7 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
   const [answerWasRevealed, setAnswerWasRevealed] = useState(false);
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
   const [solved, setSolved] = useState(false);
+  const [earnedStars, setEarnedStars] = useState<number | null>(null);
   const [voiceOn, setVoiceOn] = useState(true);
   const [speaking, setSpeaking] = useState(false);
   const speechCtrl = useRef<AbortController | null>(null);
@@ -108,6 +109,7 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
     setAnswerWasRevealed(false);
     setIncorrectAnswers(0);
     setSolved(false);
+    setEarnedStars(null);
     setCustomId(null);
     try {
       const res = await fetchHints({ data: { problem, imageDataUrl: image, track: !!user && !bankProblemId } });
@@ -135,7 +137,10 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
             : "That's all my hints. You've got this!";
 
   const bankHelp = progress.data?.help.find((row) => row.problem_id === bankProblemId);
-  const availableStars = result ? starsForAnswer(result.difficulty, Math.max(revealed, bankHelp?.hints_revealed ?? 0), !answerWasRevealed && !bankHelp?.answer_revealed && !solved && !(bankProblemId && progress.data?.solved.includes(bankProblemId)), Math.max(incorrectAnswers, bankProblemId ? progress.data?.incorrect[bankProblemId] ?? 0 : 0)) : 0;
+  const previouslySolved = !!bankProblemId && !!progress.data?.solved.includes(bankProblemId);
+  const answerRevealed = answerWasRevealed || !!bankHelp?.answer_revealed;
+  const missedCount = Math.max(incorrectAnswers, bankProblemId ? progress.data?.incorrect[bankProblemId] ?? 0 : 0);
+  const availableStars = result ? starsForAnswer(result.difficulty, Math.max(revealed, bankHelp?.hints_revealed ?? 0), !answerRevealed && !solved && !previouslySolved, missedCount) : 0;
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
@@ -218,7 +223,15 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
               </Button>
               <div role="status" aria-live="polite" aria-atomic="true" className="flex min-h-11 items-center gap-2 text-sm text-muted-foreground">
                 <Star aria-hidden="true" className="h-5 w-5 shrink-0 fill-accent text-accent" />
-                <span><strong className="tabular-nums text-accent">{availableStars}</strong> {availableStars === 1 ? "star" : "stars"} for a correct answer</span>
+                {solved && earnedStars !== null ? (
+                  <span>You earned <strong className="tabular-nums text-accent">{earnedStars}</strong> {earnedStars === 1 ? "star" : "stars"}!</span>
+                ) : solved || previouslySolved ? (
+                  <span><strong className="tabular-nums text-accent">0</strong> stars available · Already solved</span>
+                ) : answerRevealed ? (
+                  <span><strong className="tabular-nums text-accent">0</strong> stars available · Answer revealed</span>
+                ) : (
+                  <span><strong className="tabular-nums text-accent">{availableStars}</strong> {availableStars === 1 ? "star" : "stars"} for a correct answer{availableStars === 0 && missedCount > 0 ? " · Stars lost to wrong answers" : ""}</span>
+                )}
               </div>
             </div>
             {showAnswer && (
@@ -226,7 +239,7 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
                 Answer: {result.answer}
               </div>
             )}
-            {!showAnswer && revealed < result.hints.length && <AnswerChecker answer={result.answer} problemId={bankProblemId} customId={bankProblemId ? undefined : customId} onChecked={(correct) => { if (correct) setSolved(true); else setIncorrectAnswers((count) => count + 1); }} />}
+            {!showAnswer && revealed < result.hints.length && <AnswerChecker answer={result.answer} problemId={bankProblemId} customId={bankProblemId ? undefined : customId} onChecked={(correct, earned) => { if (correct) { setSolved(true); setEarnedStars(earned ?? null); } else setIncorrectAnswers((count) => count + 1); }} />}
           </div>
         )}
       </section>
