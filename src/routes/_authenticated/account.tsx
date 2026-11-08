@@ -11,6 +11,7 @@ import { useAccount } from "@/components/AccountSession";
 import { AccountField } from "@/components/AccountFields";
 import { AnswerChecker } from "@/components/AnswerChecker";
 import { DifficultyStars } from "@/components/DifficultyStars";
+import { SkillsetBreakdown } from "@/components/SkillsetBreakdown";
 import { MathText } from "@/components/MathText";
 import { stripMathDelimiters } from "@/lib/math-text";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -74,21 +75,7 @@ function AccountPage() {
       ) : stats.length === 0 ? (
         <p className="text-muted-foreground">No attempts yet. <Link to="/problems" className="text-accent underline">Answer some problems</Link> and your graph will grow here.</p>
       ) : (
-        <>
-          <ul className="space-y-4">
-            {stats.map((s) => (
-              <li key={s.concept}>
-                <div className="mb-1 flex items-baseline justify-between gap-3">
-                  <span className="min-w-0 break-words font-pixel text-[9px] uppercase leading-relaxed">{s.concept}</span>
-                  <span className="shrink-0 text-sm text-muted-foreground"><span className="text-accent">★</span> {s.earned} / {s.possible} stars</span>
-                </div>
-                <div className="flex h-4 w-full bg-secondary" role="img" aria-label={`${s.concept}: ${s.earned} of ${s.possible} possible stars`}>
-                  <div className="h-full bg-primary" style={{ width: `${s.possible ? (s.earned / s.possible) * 100 : 0}%` }} />
-                </div>
-              </li>
-            ))}
-          </ul>
-        </>
+        <SkillsetBreakdown key={user?.id} stats={stats} />
       )}
     </section>
     <section className="mt-10 border-t-4 border-border pt-6">
