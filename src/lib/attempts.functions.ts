@@ -90,7 +90,7 @@ export const getRecommendations = createServerFn({ method: "GET" })
     }));
     return {
       weakest: weakestConcepts(records),
-      problems: recommendProblems(records, (problems ?? []) as Problem[]),
+      problems: recommendProblems(records, (problems ?? []) as Problem[], 20),
     };
   });
 

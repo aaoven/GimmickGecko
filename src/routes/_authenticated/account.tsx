@@ -2,19 +2,19 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { ArrowRight, BarChart3, LogOut, Save, Star, Target, UserRound } from "lucide-react";
+import { ArrowRight, BarChart3, ChevronDown, ChevronUp, LogOut, Save, Star, Target, UserRound } from "lucide-react";
 import { getProfile, saveProfile } from "@/lib/account.functions";
-import { getMyAttempts, getRecommendations } from "@/lib/attempts.functions";
+import { getMyAttempts, getBankProgress, getRecommendations } from "@/lib/attempts.functions";
 import { computeStarBreakdown } from "@/lib/skills";
 import { profileSchema } from "@/lib/account-schema";
 import { useAccount } from "@/components/AccountSession";
 import { AccountField } from "@/components/AccountFields";
-import { AnswerChecker } from "@/components/AnswerChecker";
+import { BankProblemPractice } from "@/components/BankProblemPractice";
 import { DifficultyStars } from "@/components/DifficultyStars";
 import { SkillsetBreakdown } from "@/components/SkillsetBreakdown";
 import { MathText } from "@/components/MathText";
 import { stripMathDelimiters } from "@/lib/math-text";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,12 +28,15 @@ function AccountPage() {
   const updateProfile = useServerFn(saveProfile);
   const fetchAttempts = useServerFn(getMyAttempts);
   const fetchRecommendations = useServerFn(getRecommendations);
+  const fetchBankProgress = useServerFn(getBankProgress);
   const { user } = useAccount();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const query = useQuery({ queryKey: ["profile", user?.id], queryFn: () => fetchProfile() });
   const attemptsQuery = useQuery({ queryKey: ["attempts", user?.id], queryFn: () => fetchAttempts() });
   const recsQuery = useQuery({ queryKey: ["recommendations", user?.id], queryFn: () => fetchRecommendations() });
+  const bankProgressQuery = useQuery({ queryKey: ["bank-progress", user?.id], queryFn: () => fetchBankProgress(), enabled: !!user });
+  const [showAllRecs, setShowAllRecs] = useState(false);
   const stats = useMemo(() => computeStarBreakdown(attemptsQuery.data ?? []), [attemptsQuery.data]);
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -95,8 +98,9 @@ function AccountPage() {
           <p className="mb-5 text-sm text-muted-foreground">
             Picked from the problem bank to train your weakest concepts: {recsQuery.data.weakest.map((s) => s.concept).join(", ")}.
           </p>
-          <div className="space-y-4">
-            {recsQuery.data.problems.map((p) => {
+          {bankProgressQuery.isError && <p role="alert" className="mb-4 text-destructive">Your saved progress could not be loaded. Reload before answering or revealing hints.</p>}
+          <div id="recommended-problems" className="space-y-4">
+            {(showAllRecs ? recsQuery.data.problems : recsQuery.data.problems.slice(0, 8)).map((p) => {
               const weak = new Set(recsQuery.data.weakest.map((s) => s.concept));
               return (
                 <article key={p.id} className="bg-card p-5 pixel-box">
@@ -112,12 +116,25 @@ function AccountPage() {
                       <span key={c} className={`px-2 py-0.5 text-xs ${weak.has(c) ? "bg-accent text-accent-foreground" : "bg-secondary text-muted-foreground"}`}>{c}</span>
                     ))}
                   </div>
-                  <Link to="/ask" search={{ problem: p.statement, problemId: p.id }} className={buttonVariants({ size: "sm" })}>Get gecko hints</Link>
-                  <AnswerChecker answer={p.answer} problemId={p.id} />
+                  <BankProblemPractice
+                    key={`${p.id}:${user?.id ?? "guest"}`}
+                    problem={p}
+                    hintsUsed={bankProgressQuery.data?.help.find((h) => h.problem_id === p.id)?.hints_revealed ?? 0}
+                    answerRevealed={bankProgressQuery.data?.help.find((h) => h.problem_id === p.id)?.answer_revealed ?? false}
+                    solved={bankProgressQuery.data?.solved.includes(p.id) ?? false}
+                    incorrectAnswers={bankProgressQuery.data?.incorrect[p.id] ?? 0}
+                    ready={bankProgressQuery.isSuccess}
+                  />
                 </article>
               );
             })}
           </div>
+          {recsQuery.data.problems.length > 8 && (
+            <Button type="button" variant="outline" size="sm" className="mt-5" aria-expanded={showAllRecs} aria-controls="recommended-problems" onClick={() => setShowAllRecs((value) => !value)}>
+              {showAllRecs ? "Show less" : "Show more"}
+              {showAllRecs ? <ChevronUp aria-hidden="true" /> : <ChevronDown aria-hidden="true" />}
+            </Button>
+          )}
         </>
       )}
     </section>
