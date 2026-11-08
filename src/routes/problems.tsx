@@ -3,7 +3,9 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { listProblems } from "@/lib/problems.functions";
 import { difficultyStars } from "@/lib/difficulty";
-import { buttonVariants } from "@/components/ui/button";
+import { isCorrectAnswer } from "@/lib/answers";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const problemsQuery = queryOptions({ queryKey: ["problems"], queryFn: () => listProblems() });
 
@@ -29,6 +31,45 @@ function DifficultyStars({ value }: { value: number }) {
       {"★".repeat(filled)}
       <span className="text-muted">{"★".repeat(empty)}</span>
     </span>
+  );
+}
+
+function AnswerChecker({ answer }: { answer: string | null }) {
+  const [value, setValue] = useState("");
+  const [result, setResult] = useState<"correct" | "wrong" | null>(null);
+  if (answer == null) return null;
+  return (
+    <form
+      className="mt-4 flex flex-wrap items-center gap-3 border-t border-border pt-4"
+      onSubmit={(e) => {
+        e.preventDefault();
+        setResult(isCorrectAnswer(value, answer) ? "correct" : "wrong");
+      }}
+    >
+      <Input
+        value={value}
+        onChange={(e) => {
+          setValue(e.target.value);
+          setResult(null);
+        }}
+        placeholder="Your answer"
+        aria-label="Your answer"
+        className="h-9 w-40 bg-input"
+      />
+      <Button type="submit" size="sm" variant="secondary">
+        Check answer
+      </Button>
+      {result === "correct" && (
+        <p role="status" className="font-pixel text-[10px] uppercase text-primary">
+          Correct!
+        </p>
+      )}
+      {result === "wrong" && (
+        <p role="status" className="text-destructive">
+          Not quite — try again, or ask the gecko for a hint.
+        </p>
+      )}
+    </form>
   );
 }
 
@@ -135,6 +176,7 @@ function ProblemsPage() {
                   {openAnswer === p.id ? `Answer: ${p.answer}` : "Show answer"}
                 </button>
               </div>
+              <AnswerChecker answer={p.answer} />
             </article>
           ))}
         </section>

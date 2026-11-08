@@ -6,3 +6,4 @@
 
 # Problem bank difficulty
 - [x] Show 1–5 star difficulty on every problem; all 12 bank problems rated, 1–5 range enforced in the database, star display verified in the preview.
+- [x] Let users submit an answer on each problem card and see correct/try-again feedback; verified in the preview.
