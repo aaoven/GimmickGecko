@@ -37,11 +37,6 @@ function ProblemsPage() {
   const [difficulty, setDifficulty] = useState(0);
   const [openAnswer, setOpenAnswer] = useState<string | null>(null);
 
-  const concepts = useMemo(() => {
-    const counts = new Map<string, number>();
-    problems.forEach((p) => p.concepts.forEach((c) => counts.set(c, (counts.get(c) ?? 0) + 1)));
-    return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
-  }, [problems]);
   const contests = useMemo(() => ["All", ...new Set(problems.map((p) => p.contest))], [problems]);
 
   const filtered = problems.filter(
@@ -50,6 +45,14 @@ function ProblemsPage() {
       (difficulty === 0 || p.difficulty === difficulty) &&
       selected.every((c) => p.concepts.includes(c)),
   );
+
+  const concepts = useMemo(() => {
+    const counts = new Map<string, number>();
+    problems.forEach((p) => p.concepts.forEach((c) => counts.set(c, 0)));
+    filtered.forEach((p) => p.concepts.forEach((c) => counts.set(c, (counts.get(c) ?? 0) + 1)));
+    return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [problems, contest, difficulty, selected]);
 
   const toggle = (c: string) =>
     setSelected((s) => (s.includes(c) ? s.filter((x) => x !== c) : [...s, c]));
