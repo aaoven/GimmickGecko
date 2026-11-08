@@ -14,7 +14,7 @@ Gimmick Gecko combines the best of both worlds: identifying the key “gimmicks�
 
 ### Account Login 🔒
 
-Sign up or login using an existing account with your email to receive personally tailored feedback, skillset breakdowns, and recommended problems.
+Sign up or login with your email to receive personally tailored feedback, skillset breakdowns, and recommended problems.
 
 
 This project was built with [Lovable](https://lovable.dev).
