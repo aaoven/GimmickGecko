@@ -8,7 +8,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { AnswerChecker } from "@/components/AnswerChecker";
 import { useAccount } from "@/components/AccountSession";
 import { saveProblemHelp } from "@/lib/attempts.functions";
-import { getHints } from "@/lib/hints.functions";
+import { getHints, saveCustomHelp } from "@/lib/hints.functions";
 import type { HintResult } from "@/lib/hints.server";
 
 export function HintCoach({ initialProblem = "", problemId }: { initialProblem?: string; problemId?: string | undefined }) {
@@ -21,6 +21,8 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
   const bankProblemId = problem === initialProblem && !image ? problemId : undefined;
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<HintResult | null>(null);
+  const [customId, setCustomId] = useState<string | null>(null);
+  const saveCustom = useServerFn(saveCustomHelp);
   const [revealed, setRevealed] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [voiceOn, setVoiceOn] = useState(true);
@@ -62,6 +64,7 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
     setSavingHelp(true);
     try {
       if (bankProblemId && user) await saveHelp({ data: { problemId: bankProblemId, hints: next, answerRevealed: answer } });
+      else if (customId && user) await saveCustom({ data: { id: customId, hints: next, answerRevealed: answer } });
       if (answer) setShowAnswer(true);
       else {
         setRevealed(next);
@@ -95,10 +98,11 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
     setResult(null);
     setRevealed(0);
     setShowAnswer(false);
+    setCustomId(null);
     try {
-      const res = await fetchHints({ data: { problem, imageDataUrl: image } });
+      const res = await fetchHints({ data: { problem, imageDataUrl: image, track: !!user && !bankProblemId } });
       if (!res.ok) toast.error(res.error);
-      else setResult(res.result);
+      else { setResult(res.result); setCustomId(res.customId); }
     } catch {
       toast.error("Something went wrong. Try again.");
     } finally {
@@ -157,7 +161,11 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
 
         {result && (
           <div className="space-y-4">
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="bg-secondary px-2 py-1 font-pixel text-[9px] uppercase" aria-label={`Difficulty ${result.difficulty} out of 5 stars`}>
+                <span className="text-accent">{"★".repeat(result.difficulty)}</span>
+                <span className="text-muted-foreground">{"★".repeat(5 - result.difficulty)}</span>
+              </span>
               {result.concepts.map((c) => (
                 <span key={c} className="bg-accent px-2 py-1 font-pixel text-[9px] uppercase text-accent-foreground">
                   {c}
@@ -191,7 +199,7 @@ export function HintCoach({ initialProblem = "", problemId }: { initialProblem?:
                 Answer: {result.answer}
               </div>
             )}
-            {!showAnswer && revealed < result.hints.length && <AnswerChecker answer={result.answer} problemId={bankProblemId} />}
+            {!showAnswer && revealed < result.hints.length && <AnswerChecker answer={result.answer} problemId={bankProblemId} customId={bankProblemId ? undefined : customId} />}
           </div>
         )}
       </section>

@@ -34,3 +34,4 @@ use the editor.
 - Curated bank expansions retain source and solution URLs in `data/` and import through database data tools, not page-load seeding; this keeps provenance reproducible without repeated writes.
 - Accounts use Cloud Auth and one root AccountSession subscriber; private profiles are validated server-side and protected by owner-only RLS, with account pages under the authenticated layout.
 - Bank answers are checked server-side; a database trigger scores attempts using persisted, monotonic per-user problem help. Skill totals aggregate the best score per distinct attempted problem to avoid repeat-answer inflation.
+- Typed/uploaded gecko problems are saved per signed-in user in `custom_problems` (owner read-only RLS; writes only in server functions), with AI-assigned difficulty and concepts reused from the bank, and merge into the skillset breakdown; this keeps scoring server-side.

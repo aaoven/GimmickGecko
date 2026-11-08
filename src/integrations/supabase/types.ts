@@ -59,6 +59,62 @@ export type Database = {
           },
         ]
       }
+      custom_problems: {
+        Row: {
+          answer: string
+          answer_revealed: boolean
+          attempted: boolean
+          concepts: string[]
+          created_at: string
+          difficulty: number
+          earned_stars: number
+          hints_revealed: number
+          id: string
+          solved: boolean
+          statement: string
+          topic: string
+          user_id: string
+        }
+        Insert: {
+          answer: string
+          answer_revealed?: boolean
+          attempted?: boolean
+          concepts?: string[]
+          created_at?: string
+          difficulty: number
+          earned_stars?: number
+          hints_revealed?: number
+          id?: string
+          solved?: boolean
+          statement?: string
+          topic?: string
+          user_id: string
+        }
+        Update: {
+          answer?: string
+          answer_revealed?: boolean
+          attempted?: boolean
+          concepts?: string[]
+          created_at?: string
+          difficulty?: number
+          earned_stars?: number
+          hints_revealed?: number
+          id?: string
+          solved?: boolean
+          statement?: string
+          topic?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_problems_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       problem_help: {
         Row: {
           answer_revealed: boolean

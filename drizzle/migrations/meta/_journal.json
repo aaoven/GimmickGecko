@@ -43,6 +43,13 @@
       "when": 1794103738706,
       "tag": "0005_skill_star_scoring",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794113014402,
+      "tag": "0006_custom_problems",
+      "breakpoints": true
     }
   ]
 }

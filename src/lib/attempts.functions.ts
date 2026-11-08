@@ -28,13 +28,27 @@ export const getMyAttempts = createServerFn({ method: "GET" })
       .select("problem_id, correct, earned_stars, possible_stars, problems(concepts)")
       .order("created_at", { ascending: true });
     if (error) throw new Error("Your attempts could not be loaded.");
-    return (data ?? []).map((row) => ({
-      problemId: row.problem_id,
-      correct: row.correct,
-      earnedStars: row.earned_stars,
-      possibleStars: row.possible_stars,
-      concepts: (row.problems as unknown as { concepts: string[] } | null)?.concepts ?? [],
-    }));
+    const { data: custom, error: customError } = await context.supabase
+      .from("custom_problems")
+      .select("id, solved, earned_stars, difficulty, concepts")
+      .eq("attempted", true);
+    if (customError) throw new Error("Your attempts could not be loaded.");
+    return [
+      ...(data ?? []).map((row) => ({
+        problemId: row.problem_id,
+        correct: row.correct,
+        earnedStars: row.earned_stars,
+        possibleStars: row.possible_stars,
+        concepts: (row.problems as unknown as { concepts: string[] } | null)?.concepts ?? [],
+      })),
+      ...(custom ?? []).map((row) => ({
+        problemId: `custom:${row.id}`,
+        correct: row.solved,
+        earnedStars: row.earned_stars,
+        possibleStars: row.difficulty,
+        concepts: row.concepts,
+      })),
+    ];
   });
 
 export const getRecommendations = createServerFn({ method: "GET" })

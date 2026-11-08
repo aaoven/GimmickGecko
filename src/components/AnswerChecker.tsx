@@ -3,11 +3,12 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
 import { isCorrectAnswer } from "@/lib/answers";
 import { recordAttempt } from "@/lib/attempts.functions";
+import { checkCustomAnswer } from "@/lib/hints.functions";
 import { useAccount } from "@/components/AccountSession";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export function AnswerChecker({ answer, problemId }: { answer: string | null; problemId?: string | undefined }) {
+export function AnswerChecker({ answer, problemId, customId }: { answer: string | null; problemId?: string | undefined; customId?: string | null | undefined }) {
   const [value, setValue] = useState("");
   const [result, setResult] = useState<"correct" | "wrong" | null>(null);
   const [stars, setStars] = useState<{ earned: number; possible: number } | null>(null);
@@ -16,6 +17,7 @@ export function AnswerChecker({ answer, problemId }: { answer: string | null; pr
   const { user } = useAccount();
   const queryClient = useQueryClient();
   const record = useServerFn(recordAttempt);
+  const checkCustom = useServerFn(checkCustomAnswer);
   if (answer == null) return null;
   return (
     <form
@@ -26,10 +28,12 @@ export function AnswerChecker({ answer, problemId }: { answer: string | null; pr
         setError("");
         const correct = isCorrectAnswer(value, answer);
         setResult(correct ? "correct" : "wrong");
-        if (problemId && user) {
+        if ((problemId || customId) && user) {
           setBusy(true);
           try {
-            const saved = await record({ data: { problemId, answer: value } });
+            const saved = problemId
+              ? await record({ data: { problemId, answer: value } })
+              : await checkCustom({ data: { id: customId!, answer: value } });
             setResult(saved.correct ? "correct" : "wrong");
             setStars({ earned: saved.earnedStars, possible: saved.possibleStars });
             await queryClient.invalidateQueries({ queryKey: ["attempts"] });
